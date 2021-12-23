@@ -3,6 +3,10 @@ const Tx = require('ethereumjs-tx').Transaction;
 const eth_lazy = require('../contract/eth-lazy') 
 const eth_normal = require('../contract/eth-normal') 
 
+const adminaddress = process.env.adminaddress;
+const adminkey = process.env.adminkey;
+
+
 const web3js = new web3(
     new web3.providers.HttpProvider(
     //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
@@ -21,7 +25,7 @@ const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, pr
         coinABI = eth_lazy.ABI;
         coinAddress = eth_lazy.contractAddress;
         }
-        if(contract_type == "Normal")
+        if(contract_type == "normal")
         {
             coinABI = eth_normal.ABI;
         coinAddress = eth_normal.contractAddress;
@@ -65,6 +69,49 @@ const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, pr
         return hash;    
     }
     catch (error) {
+        console.log("error", error)
+    }
+}
+
+const Admintransfer =  async (address_to, network_type, contract_type, amount) => {
+    try 
+    {
+        let sender_address = adminaddress;
+        let sender_private_key = adminkey;
+        const privateKey = Buffer.from(sender_private_key, 'hex');
+        
+        amount = parseFloat(amount)
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            from: sender_address,
+            to: address_to,
+            amount: web3js.utils.toWei(amount, "ether"),
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 3);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+        let count = await web3js.eth.getTransactionCount(sender_address);
+
+        let sendAmount = amount * Math.pow(10, 18);
+        sendAmount = sendAmount.toString();
+
+        let rawTransaction = {
+            "from": sender_address,
+            "gasPrice": gasPrice,
+            "gasLimit": gasLimit,
+            "to": address_to,
+            "value": web3js.utils.toHex(sendAmount),
+            "nonce": web3js.utils.toHex(count)
+        };
+
+        var transaction = new Tx(rawTransaction, {chain:'ropsten'});
+        transaction.sign(privateKey);
+        let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+        return hash;          
+    }
+    catch (error)
+    {
         console.log("error", error)
     }
 }
@@ -133,5 +180,6 @@ module.exports = {
     // ETHCoinTransfer,
     hashStatusETH,
     balanceMainETH,
-    // coinBalanceETH
+    // coinBalanceETH,
+    Admintransfer
 }

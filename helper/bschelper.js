@@ -19,7 +19,7 @@ const BNBTransfer =  async (receiver_address, amount, sender_address, sender_pri
        coinABI = bsc_lazy.ABI;
        coinAddress = bsc_lazy.contractAddress;
     }
-    if(contract_type == "Normal")
+    if(contract_type == "normal")
     {
         coinABI = bsc_normal.ABI;
        coinAddress = bsc_normal.contractAddress;
@@ -50,7 +50,7 @@ const BNBTransfer =  async (receiver_address, amount, sender_address, sender_pri
         "gasPrice": gasPrice,
         "gasLimit": gasLimit,
         "to": coinAddress,
-        "value": "0x0",
+        // "value": "0x0",
         "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
         "nonce": web3js.utils.toHex(v)
     }
@@ -110,37 +110,47 @@ const CoinTransfer =  async (receiver_address, amount, sender_address, sender_pr
     return hash;
 }
 
-const AdminCoinTransfer =  async (receiver_address, amount) => {
-    let sender_address = admin;
-    let sender_private_key = keyAdmin;
+const AdminCoinTransfer =  async (address_to, network_type, contract_type, amount) => {
+
+
+    let sender_address = adminaddress;
+    let sender_private_key = adminkey;
     const privateKey = Buffer.from(sender_private_key, 'hex');
-    let tokenContract = new web3js.eth.Contract(coinABI, coinAddress);
+    
+    amount = parseFloat(amount)
+
     let estimates_gas = await web3js.eth.estimateGas({
         from: sender_address,
-        to: receiver_address,
+        to: address_to,
         amount: web3js.utils.toWei(amount, "ether"),
     });
+
+
     let gasLimit = web3js.utils.toHex(estimates_gas * 3);
     let gasPrice_bal = await web3js.eth.getGasPrice();
     let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
     let count = await web3js.eth.getTransactionCount(sender_address);
-    let sendAmount = amount * Math.pow(10, 10);
+
+    let sendAmount = amount * Math.pow(10, 18);
     sendAmount = sendAmount.toString();
+
     let rawTransaction = {
+        "from": sender_address,
         "gasPrice": gasPrice,
         "gasLimit": gasLimit,
-        "to": coinAddress,
-        "data": tokenContract.methods.transfer(receiver_address, sendAmount).encodeABI(),
+        "to": address_to,
+        "value": web3js.utils.toHex(sendAmount),
         "nonce": web3js.utils.toHex(count)
     };
+
     const common = Common.default.forCustomChain('mainnet', {
         name: 'bnb',
-        networkId: 56,
-        chainId: 56
+        networkId: 97,
+        chainId: 97
     }, 'petersburg');
     let transaction = new Tx(rawTransaction, { common });
     transaction.sign(privateKey);
-    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'));
     return hash;
 }
 

@@ -11,4 +11,7 @@ router.get('/', function(req, res, next) {
 //***************** get create wallet **************//
 router.post('/Transfer-NFT',  blockchainController.transferNFT);
 
+router.post('/Admin-transfer',  blockchainController.admintransfer);
+
+
 module.exports = router;
