@@ -13,8 +13,10 @@ const transferNFT = async (req, res) => {
     if(network_type == "ETH")
     {
         let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey)
+        let hash = transfer.transactionHash
+        let status = "1";
         console.log("transfer", transfer);
-        res.send({ transfer })
+        res.send({ hash,status })
     }
     if(network_type == "BNB")
     {

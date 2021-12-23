@@ -12,53 +12,61 @@ const web3js = new web3(
 );
 
 const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
-    let coinABI = "";
-    let coinAddress = "";
-    if(contract_type == "Lazy")
+    try 
     {
-       coinABI = eth_lazy.ABI;
-       coinAddress = eth_lazy.contractAddress;
-    }
-    if(contract_type == "Normal")
-    {
-        coinABI = eth_normal.ABI;
-       coinAddress = eth_normal.contractAddress;
-    }
-    let tokenContract = new web3js.eth.Contract(coinABI, coinAddress);
+        let coinABI = "";
+        let coinAddress = "";
+        if(contract_type == "Lazy")
+        {
+        coinABI = eth_lazy.ABI;
+        coinAddress = eth_lazy.contractAddress;
+        }
+        if(contract_type == "Normal")
+        {
+            coinABI = eth_normal.ABI;
+        coinAddress = eth_normal.contractAddress;
+        }
+        let tokenContract = new web3js.eth.Contract(coinABI, coinAddress);
 
-    if(privatekey.length > 64){
-        let num = privatekey.length - 64;
-        privatekey = privatekey.slice(num);
-    }
-    const privateKey = Buffer.from(privatekey, 'hex');
-    
-    let estimates_gas = await web3js.eth.estimateGas({
-        from: address_from,
-        to: address_to,
-        data: tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
-    });
+        if(privatekey.length > 64){
+            let num = privatekey.length - 64;
+            privatekey = privatekey.slice(num);
+        }
+        const privateKey = Buffer.from(privatekey, 'hex');
+        console.log("privateKey", privateKey);
 
-    let gasLimit = web3js.utils.toHex(estimates_gas * 2);
-    let gasPrice_bal = await web3js.eth.getGasPrice();
-    let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
-    let v = await web3js.eth.getTransactionCount(address_from)
+        let estimates_gas = await web3js.eth.estimateGas({
+            from: address_from,
+            to: address_to,
+            data: tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
+        });
+        console.log("estimates_gas", estimates_gas);
 
-    let rawTransaction = {
-        "from": address_from,
-        // "chainId" : web3js.utils.toHex('1221'),
-        "gasPrice": gasPrice,
-        "gasLimit": gasLimit,
-        "to": contractAddress,
-        "value": "0x0",
-        "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
-        "nonce": web3js.utils.toHex(v)
+        let gasLimit = web3js.utils.toHex(estimates_gas * 4);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
+        let v = await web3js.eth.getTransactionCount(address_from)
+
+        let rawTransaction = {
+            "from": address_from,
+            // "chainId" : web3js.utils.toHex('1221'),
+            "gasPrice": gasPrice,
+            // "gasLimit": gasLimit,
+            'gas': 5000000,
+            "to": coinAddress,
+            "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
+            "nonce": web3js.utils.toHex(v)
+            
+        }
         
+        let transaction = new Tx(rawTransaction, {chain:'ropsten'});
+        transaction.sign(privateKey);
+        let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+        return hash;    
     }
-    
-    let transaction = new Tx(rawTransaction, {chain:'ropsten'});
-    transaction.sign(privateKey);
-    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
-    return hash;
+    catch (error) {
+        console.log("error", error)
+    }
 }
 
 // const ETHCoinTransfer =  async (receiver_address, amount, sender_address, sender_private_key) => {

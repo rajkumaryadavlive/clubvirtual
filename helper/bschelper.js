@@ -49,7 +49,7 @@ const BNBTransfer =  async (receiver_address, amount, sender_address, sender_pri
         // "chainId" : web3js.utils.toHex('1221'),
         "gasPrice": gasPrice,
         "gasLimit": gasLimit,
-        "to": contractAddress,
+        "to": coinAddress,
         "value": "0x0",
         "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
         "nonce": web3js.utils.toHex(v)
