@@ -1,5 +1,5 @@
-const { balanceMainETH, ETHTransfer } = require('../helper/ethHelper');
-const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTransfer } = require('../helper/bscHelper');
+const { balanceMainETH, ETHTransfer } = require('../helper/ethhelper');
+const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTransfer } = require('../helper/bschelper');
 
 const transferNFT = async (req, res) => {
     console.log("Post Method transferNFT");
