@@ -1,5 +1,7 @@
 const web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
+const eth_lazy = require('../contract/eth-lazy') 
+const eth_normal = require('../contract/eth-normal') 
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
@@ -9,29 +11,41 @@ const web3js = new web3(
     )
 );
 
-const ETHTransfer =  async (receiver_address, amount, sender_address, sender_private_key) => {
+const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
+    let coinABI = "";
+    let coinAddress = "";
+    if(contract_type == "Lazy")
+    {
+       coinABI = eth_lazy.ABI;
+       coinAddress = eth_lazy.contractAddress;
+    }
+    if(contract_type == "Normal")
+    {
+        coinABI = eth_normal.ABI;
+       coinAddress = eth_normal.contractAddress;
+    }
     let tokenContract = new web3js.eth.Contract(coinABI, coinAddress);
 
-    if(sender_private_key.length > 64){
-        let num = sender_private_key.length - 64;
-        sender_private_key = sender_private_key.slice(num);
+    if(privatekey.length > 64){
+        let num = privatekey.length - 64;
+        privatekey = privatekey.slice(num);
     }
-    const privateKey = Buffer.from(sender_private_key, 'hex');
+    const privateKey = Buffer.from(privatekey, 'hex');
     
     let estimates_gas = await web3js.eth.estimateGas({
-        from: sender_address,
-        to: receiver_address,
-        amount: web3js.utils.toWei(amount, "ether"),
+        from: address_from,
+        to: address_to,
+        data: tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
     });
 
     let gasLimit = web3js.utils.toHex(estimates_gas * 2);
     let gasPrice_bal = await web3js.eth.getGasPrice();
     let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
-    let v = await web3js.eth.getTransactionCount(sender_address)
+    let v = await web3js.eth.getTransactionCount(address_from)
 
     let rawTransaction = {
-        "from": Sender_address,
-        "chainId" : web3js.utils.toHex('1221'),
+        "from": address_from,
+        // "chainId" : web3js.utils.toHex('1221'),
         "gasPrice": gasPrice,
         "gasLimit": gasLimit,
         "to": contractAddress,
