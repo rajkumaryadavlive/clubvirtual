@@ -42,6 +42,7 @@ const admintransfer = async (req, res) => {
     console.log("req body", req.body);
     let address_to = req.body.address_to;
     let amount = req.body.amount;
+    amount = amount.toString()
     let network_type= req.body.network_type;
     let address_from = req.body.address_from;
     let privatekey = req.body.privatekey;
