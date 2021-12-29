@@ -3,8 +3,7 @@ const Tx = require('ethereumjs-tx').Transaction;
 const eth_lazy = require('../contract/eth-lazy') 
 const eth_normal = require('../contract/eth-normal') 
 
-const adminaddress = process.env.adminaddress;
-const adminkey = process.env.adminkey;
+
 
 
 const web3js = new web3(
@@ -73,11 +72,11 @@ const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, pr
     }
 }
 
-const Admintransfer =  async (address_to, network_type, contract_type, amount) => {
+const Admintransfer =  async (address_from, privatekey, address_to, amount) => {
     try 
     {
-        let sender_address = adminaddress;
-        let sender_private_key = adminkey;
+        let sender_address = address_from;
+        let sender_private_key = privatekey;
         const privateKey = Buffer.from(sender_private_key, 'hex');
         
         amount = parseFloat(amount)

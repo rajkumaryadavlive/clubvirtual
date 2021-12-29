@@ -110,11 +110,11 @@ const CoinTransfer =  async (receiver_address, amount, sender_address, sender_pr
     return hash;
 }
 
-const AdminCoinTransfer =  async (address_to, network_type, contract_type, amount) => {
+const AdminCoinTransfer =  async (address_from, privatekey, address_to, amount) => {
 
 
-    let sender_address = adminaddress;
-    let sender_private_key = adminkey;
+    let sender_address = address_from;
+    let sender_private_key = privatekey;
     const privateKey = Buffer.from(sender_private_key, 'hex');
     
     amount = parseFloat(amount)

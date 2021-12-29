@@ -7,7 +7,7 @@ const matic_normal = require('../contract/matic-normal')
 const web3js = new web3(
     new web3.providers.HttpProvider(
       "https://rpc-mumbai.maticvigil.com/"
-    // "https://bsc-dataseed1.binance.org:443"
+    //   "https://testnet.matic.network"
     )
 );
 
@@ -62,11 +62,11 @@ const maticTransfer =  async (receiver_address, amount, sender_address, sender_p
 }
 
 
-const Adminmatictransfer =  async (address_to, network_type, contract_type, amount) => {
+const Adminmatictransfer =  async (address_from, privatekey, address_to, amount) => {
     try 
     {
-        let sender_address = adminaddress;
-        let sender_private_key = adminkey;
+        let sender_address = address_from;
+        let sender_private_key = privatekey;
         const privateKey = Buffer.from(sender_private_key, 'hex');
         
         amount = parseFloat(amount)
