@@ -11,7 +11,7 @@ const web3js = new web3(
     )
 );
 
-const maticTransfer =  async (receiver_address, amount, sender_address, sender_private_key) => {
+const maticTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
     let coinABI = "";
     let coinAddress = "";
     if(contract_type == "Lazy")
