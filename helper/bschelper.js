@@ -38,22 +38,25 @@ const BNBTransfer =  async (address_from, address_to, tokenid, contract_type, pr
         to: address_to,
         data: tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
     });
+    console.log("estimates_gas", estimates_gas);
 
-    let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+    let gasLimit = web3js.utils.toHex(estimates_gas * 4);
     let gasPrice_bal = await web3js.eth.getGasPrice();
-    let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+    let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
     let v = await web3js.eth.getTransactionCount(address_from)
 
     let rawTransaction = {
-        "from": address_from,
-        // "chainId" : web3js.utils.toHex('1221'),
-        "gasPrice": gasPrice,
-        "gasLimit": gasLimit,
-        "to": coinAddress,
-        // "value": "0x0",
-        "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
-        "nonce": web3js.utils.toHex(v)
+            "from": address_from,
+            // "chainId" : web3js.utils.toHex('1221'),
+            "gasPrice": gasPrice,
+            // "gasLimit": gasLimit,
+            'gas': 5000000,
+            "to": coinAddress,
+            "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
+            "nonce": web3js.utils.toHex(v)
+            
     }
+    
     const common = Common.default.forCustomChain('mainnet', {
         name: 'bnb',
         networkId: 97,
