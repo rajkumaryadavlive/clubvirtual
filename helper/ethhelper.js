@@ -79,7 +79,7 @@ const Admintransfer =  async (address_from, privatekey, address_to, amount) => {
         let sender_private_key = privatekey;
         const privateKey = Buffer.from(sender_private_key, 'hex');
         
-        amount = parseFloat(amount)
+        // amount = parseFloat(amount)
 
         let estimates_gas = await web3js.eth.estimateGas({
             from: sender_address,

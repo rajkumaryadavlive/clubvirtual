@@ -56,7 +56,7 @@ const BNBTransfer =  async (address_from, address_to, tokenid, contract_type, pr
             "nonce": web3js.utils.toHex(v)
             
     }
-    
+
     const common = Common.default.forCustomChain('mainnet', {
         name: 'bnb',
         networkId: 97,
@@ -120,7 +120,7 @@ const AdminCoinTransfer =  async (address_from, privatekey, address_to, amount) 
     let sender_private_key = privatekey;
     const privateKey = Buffer.from(sender_private_key, 'hex');
     
-    amount = parseFloat(amount)
+    // amount = parseFloat(amount)
 
     let estimates_gas = await web3js.eth.estimateGas({
         from: sender_address,

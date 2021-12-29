@@ -56,7 +56,8 @@ const maticTransfer =  async (address_from, address_to, tokenid, contract_type, 
         "nonce": web3js.utils.toHex(v)
     }
     
-    let transaction = new Tx(rawTransaction, { chain:'ropsten' });
+    // let transaction = new Tx(rawTransaction, { chain:'ropsten' });
+    let transaction = new Tx(rawTransaction, { chain:'80001' });
     transaction.sign(privateKey);
     let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'));
     return hash;
@@ -70,13 +71,16 @@ const Adminmatictransfer =  async (address_from, privatekey, address_to, amount)
         let sender_private_key = privatekey;
         const privateKey = Buffer.from(sender_private_key, 'hex');
         
-        amount = parseFloat(amount)
+        console.log("matic sender_address", sender_address, "privateKey", privateKey);
+        // amount = parseFloat(amount)
 
         let estimates_gas = await web3js.eth.estimateGas({
             from: sender_address,
             to: address_to,
             amount: web3js.utils.toWei(amount, "ether"),
         });
+
+        console.log("estimates_gas", estimates_gas);
 
         let gasLimit = web3js.utils.toHex(estimates_gas * 3);
         let gasPrice_bal = await web3js.eth.getGasPrice();
@@ -95,7 +99,14 @@ const Adminmatictransfer =  async (address_from, privatekey, address_to, amount)
             "nonce": web3js.utils.toHex(count)
         };
 
-        let transaction = new Tx(rawTransaction, { chain:'ropsten' });
+        console.log("rawTransaction", rawTransaction);
+        
+        const common = Common.default.forCustomChain('mainnet', {
+            name: 'Matic',
+            networkId: 80001,
+            chainId: 80001
+        }, 'petersburg');
+        let transaction = new Tx(rawTransaction, { common });
         transaction.sign(privateKey);
         let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'));
         return hash;
