@@ -19,7 +19,7 @@ const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, pr
     {
         let coinABI = "";
         let coinAddress = "";
-        if(contract_type == "Lazy")
+        if(contract_type == "lazy")
         {
         coinABI = eth_lazy.ABI;
         coinAddress = eth_lazy.contractAddress;

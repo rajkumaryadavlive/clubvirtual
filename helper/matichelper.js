@@ -14,7 +14,7 @@ const web3js = new web3(
 const maticTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
     let coinABI = "";
     let coinAddress = "";
-    if(contract_type == "Lazy")
+    if(contract_type == "lazy")
     {
        coinABI = matic_lazy.ABI;
        coinAddress = matic_lazy.contractAddress;
