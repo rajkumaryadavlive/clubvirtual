@@ -62,7 +62,7 @@ const admintransfer = async (req, res) => {
         console.log("transfer", transfer);
         res.send({ hash,status })
     }
-    if(network_type == "Matic")
+    if(network_type == "MATIC")
     {
         let transfer = await Adminmatictransfer(address_from, privatekey, address_to, amount)
         let hash = transfer.transactionHash
