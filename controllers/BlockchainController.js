@@ -27,7 +27,7 @@ const transferNFT = async (req, res) => {
         console.log("transfer", transfer);
         res.send({ hash,status })
     }
-    if(network_type == "Matic")
+    if(network_type == "MATIC")
     {
         let transfer = await maticTransfer(address_from, address_to, tokenid, contract_type, privatekey)
         let hash = transfer.transactionHash
