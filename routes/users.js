@@ -13,5 +13,7 @@ router.post('/Transfer-NFT',  blockchainController.transferNFT);
 
 router.post('/Admin-transfer',  blockchainController.admintransfer);
 
+router.post('/ipfs-upload',  blockchainController.ipfsUpload);
+
 
 module.exports = router;

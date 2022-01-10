@@ -1,6 +1,7 @@
 const { balanceMainETH, ETHTransfer, Admintransfer } = require('../helper/ethhelper');
 const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTransfer } = require('../helper/bschelper');
 const { maticTransfer, Adminmatictransfer } = require('../helper/matichelper')
+const ipfsAPI = require("ipfs-api");
 
 const transferNFT = async (req, res) => {
     console.log("Post Method transferNFT");
@@ -73,6 +74,26 @@ const admintransfer = async (req, res) => {
     }
 }
 
+const ipfsUpload = async (req, res) => {
+    const ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
+    
+    let testFile1 = {
+        name: `${req.body.name}`,
+        price: `${req.body.price}`,
+        uri: `${req.body.uri}`,
+      };
+      let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
+      await ipfs.files.add(testBuffer2, function (err2, file2) {
+        if (err2) {
+          console.log(err2);
+        }
+        //console.log(file2);
+        console.log(`https://gateway.ipfs.io/ipfs/${file2[0].path}`);
+        let hash2 = file2[0].path;
+
+        res.send(hash2);
+    });
+}
 module.exports = {
     transferNFT,
     admintransfer
