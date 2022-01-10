@@ -112,7 +112,7 @@ const signTrx = async (req, res) => {
         }
     ]
     let from = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
-    web3js.currentProvider.sendAsync({
+    web3js.sendAsync({
         method: 'eth_signTypedData',
         params: [msgParams, from],
         from: from,
