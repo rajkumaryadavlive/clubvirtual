@@ -117,5 +117,6 @@ const signTrx = async (req, res) => {
 module.exports = {
     transferNFT,
     admintransfer,
-    ipfsUpload
+    ipfsUpload,
+    signTrx
 };
