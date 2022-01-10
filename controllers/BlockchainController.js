@@ -91,38 +91,48 @@ const ipfsUpload = async (req, res) => {
 }
 const signTrx = async (req, res) => {
 
-    const web3js = new web3(
-        new web3.providers.HttpProvider(
-        //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
-        "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
-    
-        )
-    );
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
 
-    const msgParams = [
-        {
-            type: 'string',      // Any valid solidity type
-            name: 'Message',     // Any string label you want
-            value: 'Hi, Alice!'  // The value to sign
-        },
-        {
-            type: 'uint32',
-            name: 'A number',
-            value: '1337'
-        }
-    ]
-    let from = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
-    web3js.send({
-        method: 'eth_signTypedData',
-        params: [msgParams, from],
-        from: from,
-    }, function (err, result) {
-        if (err) return console.error(err)
-        if (result.error) {
-            return console.error(result.error.message)
-        }
-        res.send(result);
-    })
+    // The MetaMask plugin also allows signing transactions to
+    // send ether and pay to change state within the blockchain.
+    // For this, you need the account signer...
+    const signer = provider.getSigner()
+    signature = await signer.signMessage("Hello World");
+    console.log(signature);
+
+
+    // const web3js = new web3(
+    //     new web3.providers.HttpProvider(
+    //     //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+    //     "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+    
+    //     )
+    // );
+
+    // const msgParams = [
+    //     {
+    //         type: 'string',      // Any valid solidity type
+    //         name: 'Message',     // Any string label you want
+    //         value: 'Hi, Alice!'  // The value to sign
+    //     },
+    //     {
+    //         type: 'uint32',
+    //         name: 'A number',
+    //         value: '1337'
+    //     }
+    // ]
+    // let from = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
+    // web3.currentProvider.sendAsync({
+    //     method: 'eth_signTypedData',
+    //     params: [msgParams, from],
+    //     from: from,
+    // }, function (err, result) {
+    //     if (err) return console.error(err)
+    //     if (result.error) {
+    //         return console.error(result.error.message)
+    //     }
+    //     res.send(result);
+    // })
 }
 module.exports = {
     transferNFT,
