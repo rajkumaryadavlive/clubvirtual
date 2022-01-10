@@ -96,5 +96,6 @@ const ipfsUpload = async (req, res) => {
 }
 module.exports = {
     transferNFT,
-    admintransfer
+    admintransfer,
+    ipfsUpload
 };
