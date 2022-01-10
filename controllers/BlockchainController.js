@@ -90,6 +90,15 @@ const ipfsUpload = async (req, res) => {
     });
 }
 const signTrx = async (req, res) => {
+
+    const web3js = new web3(
+        new web3.providers.HttpProvider(
+        //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+        "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+    
+        )
+    );
+
     const msgParams = [
         {
             type: 'string',      // Any valid solidity type
@@ -103,7 +112,7 @@ const signTrx = async (req, res) => {
         }
     ]
     let from = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
-    web3.currentProvider.sendAsync({
+    web3js.currentProvider.sendAsync({
         method: 'eth_signTypedData',
         params: [msgParams, from],
         from: from,
