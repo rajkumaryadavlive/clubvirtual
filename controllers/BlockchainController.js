@@ -93,7 +93,9 @@ const ipfsUpload = async (req, res) => {
 }
 const signTrx = async (req, res) => {
 
-    const provider = new ethers.providers.Web3Provider('https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05')
+    const provider = new ethers.providers.Web3Provider(new web3.providers.HttpProvider(
+        "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"    
+        ));
 
     // The MetaMask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
