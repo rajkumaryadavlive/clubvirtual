@@ -114,7 +114,7 @@ const ipfsUploadNew = async (req, res) => {
     //     })
     // })
     console.log(end);
-    for(let f=start;f<=end;f++){
+    for(let f=start;f<=10000;f++){
         // console.log(f);
         arrayOfFiles.push({
             path: Math.random(),
@@ -150,6 +150,86 @@ const ipfsUploadNew = async (req, res) => {
     });    
     res.send("done");
     return ;
+}
+
+const ipfsUploadWithAttr = async (req, res) => {
+    const ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
+    console.log("req body", req.body);
+
+    let path = req.body.path;
+    console.log(path);
+    let buffer = "";
+    
+    let arrayOfFiles = [];
+
+    var config = {
+        method: 'get',
+        url: 'http://127.0.0.1:8001/all-data',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+      };
+      let response = await axios(config);
+      console.log(response);
+      let start = response.data.start;
+      response = response.data.data;
+      response.forEach(async(element,index) => {
+        testFile1 = JSON.parse(element);
+        // testFile1.attributes = JSON.parse(element.attributes);
+        let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
+
+        arrayOfFiles.push({
+            path: Math.random(),
+            content: testBuffer2,
+            // mtime: fs.statSync(file).mtime
+        })
+
+      });
+
+      await ipfs.add(arrayOfFiles, function (err2, resp) {
+            if (err2) {
+                console.log(err2);
+            }
+            console.log(resp);
+            let ipfshash = [];
+            resp.forEach((element,index) => {
+                ipfshash[index] = element.hash;
+            })
+            console.log(ipfshash);
+            axios.post('http://127.0.0.1:8000/api/update-ipfs-metadata', {
+                    hash:ipfshash,
+                    start:start
+                })
+                .then(res => {
+                    console.log(`statusCode: ${res.status}`)
+                    console.log(res)
+                })
+                .catch(error => {
+                    console.error(error)
+                });
+
+        });
+
+        res.send("done");
+        // upload attr
+        // let attr =  JSON.parse(req.body.attributes);
+        // let testFile1 = {
+        //     name: `${req.body.name}`,
+        //     image: 'https://gateway.ipfs.io/ipfs/'+hash2,
+        //     attributes: attr,
+        //   };
+        // let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
+        
+        // await ipfs.files.add(testBuffer2, function (err2, resp) {
+        //     if (err2) {
+        //         console.log(err2);
+        //     }
+
+        //     console.log(resp);
+        //     let newpath = resp ? resp[0].path : "";
+
+        //     res.send(newpath);
+        // });
 }
 
 const signTrx = async (req, res) => {
@@ -202,5 +282,6 @@ module.exports = {
     admintransfer,
     ipfsUpload,
     ipfsUploadNew,
+    ipfsUploadWithAttr,
     signTrx
 };

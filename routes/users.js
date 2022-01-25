@@ -17,6 +17,8 @@ router.post('/ipfs-upload',  blockchainController.ipfsUpload);
 
 router.post('/ipfs-upload-new',  blockchainController.ipfsUploadNew);
 
+router.post('/ipfs-upload-attr',  blockchainController.ipfsUploadWithAttr);
+
 router.post('/sign-trx',  blockchainController.signTrx);
 
 
