@@ -3,8 +3,9 @@ const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTran
 const { maticTransfer, Adminmatictransfer } = require('../helper/matichelper')
 const ipfsAPI = require("ipfs-api");
 const web3 = require('web3');
-const { ethers } = require("ethers");
-
+// const { ethers } = require("ethers");
+let fs = require("fs");
+var axios = require('axios');
 
 const transferNFT = async (req, res) => {
     console.log("Post Method transferNFT");
@@ -91,9 +92,69 @@ const ipfsUpload = async (req, res) => {
         res.send(hash2);
     });
 }
+
+const ipfsUploadNew = async (req, res) => {
+    const ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
+    console.log("req body", req.body);
+
+    let start = req.body.start;
+    start = parseInt(start);
+    let end = start+200;
+    let ipfsArray = [];
+    let promises = [];
+
+    let arrayOfFiles = [];
+
+    let fileCount
+    // files.forEach(function (file) {
+    //     arrayOfFiles.push({
+    //         path: Math.random(),
+    //         content: fs.readFileSync(`${__dirname}/export/${file}`),
+    //         // mtime: fs.statSync(file).mtime
+    //     })
+    // })
+    console.log(end);
+    for(let f=start;f<=end;f++){
+        // console.log(f);
+        arrayOfFiles.push({
+            path: Math.random(),
+            content: fs.readFileSync(`${__dirname}/export/${f}.png`),
+            // mtime: fs.statSync(file).mtime
+        })
+    }
+
+    console.log(arrayOfFiles);
+
+    let j=1;
+    await ipfs.add(arrayOfFiles, async (err2, result) => {
+        console.info(result)
+        if(result){
+            let ipfshash = [];
+            result.forEach((element,index) => {
+                ipfshash[index] = element.hash;
+            })
+            console.log(ipfshash);
+            axios.post('http://127.0.0.1:8001/api/update-ipfs-link', {
+                    hash:ipfshash,
+                    start:start
+                })
+                .then(res => {
+                    console.log(`statusCode: ${res.status}`)
+                    console.log(res)
+                })
+                .catch(error => {
+                    console.error(error)
+                })
+            res.send(ipfshash);
+        }
+    });    
+    res.send("done");
+    return ;
+}
+
 const signTrx = async (req, res) => {
 
-    const provider = new ethers.providers.JsonRpcProvider();
+    const provider = new ethers.providers.Web3Provider(web3.currentProvider);
 
     // The MetaMask plugin also allows signing transactions to
     // send ether and pay to change state within the blockchain.
@@ -140,5 +201,6 @@ module.exports = {
     transferNFT,
     admintransfer,
     ipfsUpload,
+    ipfsUploadNew,
     signTrx
 };
