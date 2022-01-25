@@ -134,7 +134,7 @@ const ipfsUploadNew = async (req, res) => {
                 ipfshash[index] = element.hash;
             })
             console.log(ipfshash);
-            axios.post('http://127.0.0.1:8001/api/update-ipfs-link', {
+            axios.post('http://18.223.117.55/api/update-ipfs-link', {
                     hash:ipfshash,
                     start:start
                 })
