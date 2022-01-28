@@ -11,6 +11,125 @@ const web3js = new web3(
     )
 );
 
+const makeTransaction = async (data) => {
+    try {
+
+       // console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = "";
+        let contractAbi = "";
+        if (data.contract_type == "lazy") {
+            contractAbi = eth_lazy.ABI;
+            contractAddress = eth_lazy.contractAddress;
+        }else{
+            contractAbi = eth_normal.ABI;
+            contractAddress = eth_normal.contractAddress;
+        }
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = "";
+        let amt =  data.amount * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+
+        if(data.functionName == "redeem"){
+            let voucher = JSON.parse(data.voucher);
+            let minPrice =  voucher.minPrice * 1000000000000000000;
+            minPrice = minPrice.toFixed(0);
+            minPrice = BigInt(minPrice).toString();
+
+            voucher.minPrice = minPrice;
+            
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, 100).encodeABI();
+        } else{
+            trData = nftContract.methods.transferamount(data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
+        }
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'value' : amt,
+            'data' : trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+        
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'value': amt,
+            'data' : trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+
+const makeSellTransaction = async (data) => {
+    try {
+       console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = "";
+        let contractAbi = "";
+        if (data.contract_type == "lazy") {
+            contractAbi = eth_lazy.ABI;
+            contractAddress = eth_lazy.contractAddress;
+        }else{
+            contractAbi = eth_normal.ABI;
+            contractAddress = eth_normal.contractAddress;
+        }
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = nftContract.methods.transferFrom(data.selectedAccount, data.transferTo, data.tokenId).encodeABI();
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'data' : trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+        
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'data' : trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+
 const BNBTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
     let coinABI = "";
     let coinAddress = "";
@@ -206,5 +325,7 @@ module.exports = {
     balanceMainBNB,
     coinBalanceBNB,
     createWalletHelper,
-    checkWalletPrivateHelper
+    checkWalletPrivateHelper,
+    makeTransaction,
+    makeSellTransaction
 }

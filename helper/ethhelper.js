@@ -1,37 +1,153 @@
 const web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
-const eth_lazy = require('../contract/eth-lazy') 
-const eth_normal = require('../contract/eth-normal') 
+const eth_lazy = require('../contract/eth-lazy')
+const eth_normal = require('../contract/eth-normal')
 
 
 
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
-    //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
-    "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+        //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
+        "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
 
     )
 );
 
-const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
-    try 
-    {
+const makeTransaction = async (data) => {
+    try {
+
+       // console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = "";
+        let contractAbi = "";
+        if (data.contract_type == "lazy") {
+            contractAbi = eth_lazy.ABI;
+            contractAddress = eth_lazy.contractAddress;
+        }else{
+            contractAbi = eth_normal.ABI;
+            contractAddress = eth_normal.contractAddress;
+        }
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = "";
+        let amt =  data.amount * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+
+        if(data.functionName == "redeem"){
+            let voucher = JSON.parse(data.voucher);
+            let minPrice =  voucher.minPrice * 1000000000000000000;
+            minPrice = minPrice.toFixed(0);
+            minPrice = BigInt(minPrice).toString();
+
+            voucher.minPrice = minPrice;
+            
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, 100).encodeABI();
+        } else{
+            trData = nftContract.methods.transferamount(data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
+        }
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'value' : amt,
+            'data' : trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+        
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'value': amt,
+            'data' : trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+
+const makeSellTransaction = async (data) => {
+    try {
+       console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = "";
+        let contractAbi = "";
+        if (data.contract_type == "lazy") {
+            contractAbi = eth_lazy.ABI;
+            contractAddress = eth_lazy.contractAddress;
+        }else{
+            contractAbi = eth_normal.ABI;
+            contractAddress = eth_normal.contractAddress;
+        }
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = nftContract.methods.transferFrom(data.selectedAccount, data.transferTo, data.tokenId).encodeABI();
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'data' : trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+        
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'data' : trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+
+const ETHTransfer = async (address_from, address_to, tokenid, contract_type, privatekey) => {
+    try {
         let coinABI = "";
         let coinAddress = "";
-        if(contract_type == "lazy")
-        {
-        coinABI = eth_lazy.ABI;
-        coinAddress = eth_lazy.contractAddress;
+        if (contract_type == "lazy") {
+            coinABI = eth_lazy.ABI;
+            coinAddress = eth_lazy.contractAddress;
         }
-        if(contract_type == "normal")
-        {
+        if (contract_type == "normal") {
             coinABI = eth_normal.ABI;
-        coinAddress = eth_normal.contractAddress;
+            coinAddress = eth_normal.contractAddress;
         }
         let tokenContract = new web3js.eth.Contract(coinABI, coinAddress);
 
-        if(privatekey.length > 64){
+        if (privatekey.length > 64) {
             let num = privatekey.length - 64;
             privatekey = privatekey.slice(num);
         }
@@ -59,26 +175,25 @@ const ETHTransfer =  async (address_from, address_to, tokenid, contract_type, pr
             "to": coinAddress,
             "data": tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI(),
             "nonce": web3js.utils.toHex(v)
-            
+
         }
-        
-        let transaction = new Tx(rawTransaction, {chain:'ropsten'});
+
+        let transaction = new Tx(rawTransaction, { chain: 'ropsten' });
         transaction.sign(privateKey);
         let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
-        return hash;    
+        return hash;
     }
     catch (error) {
         console.log("error", error)
     }
 }
 
-const Admintransfer =  async (address_from, privatekey, address_to, amount) => {
-    try 
-    {
+const Admintransfer = async (address_from, privatekey, address_to, amount) => {
+    try {
         let sender_address = address_from;
         let sender_private_key = privatekey;
         const privateKey = Buffer.from(sender_private_key, 'hex');
-        
+
         // amount = parseFloat(amount)
 
         let estimates_gas = await web3js.eth.estimateGas({
@@ -104,13 +219,12 @@ const Admintransfer =  async (address_from, privatekey, address_to, amount) => {
             "nonce": web3js.utils.toHex(count)
         };
 
-        var transaction = new Tx(rawTransaction, {chain:'ropsten'});
+        var transaction = new Tx(rawTransaction, { chain: 'ropsten' });
         transaction.sign(privateKey);
         let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
-        return hash;          
+        return hash;
     }
-    catch (error)
-    {
+    catch (error) {
         console.log("error", error)
     }
 }
@@ -149,15 +263,15 @@ const Admintransfer =  async (address_from, privatekey, address_to, amount) => {
 
 const hashStatusETH = async (hash) => {
     let status = await web3js.eth.getTransactionReceipt(hash);
-    if(status){
+    if (status) {
         return status.blockNumber;
     }
 }
 
 const balanceMainETH = async (account) => {
     let balance = await web3js.eth.getBalance(account);
-    if(balance){
-        balance = balance / Math.pow(10,18);
+    if (balance) {
+        balance = balance / Math.pow(10, 18);
         return balance;
     }
 };
@@ -180,5 +294,7 @@ module.exports = {
     hashStatusETH,
     balanceMainETH,
     // coinBalanceETH,
-    Admintransfer
+    Admintransfer,
+    makeTransaction,
+    makeSellTransaction
 }

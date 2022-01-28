@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const blockchainController = require('../controllers/BlockchainController')
+const transactionController = require('../controllers/TransactionController')
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -12,6 +13,10 @@ router.get('/', function(req, res, next) {
 router.post('/Transfer-NFT',  blockchainController.transferNFT);
 
 router.post('/Admin-transfer',  blockchainController.admintransfer);
+
+router.post('/make-trx',  transactionController.makeTrx);
+
+router.post('/make-sell-trx',  transactionController.sellTrx);
 
 router.post('/ipfs-upload',  blockchainController.ipfsUpload);
 
