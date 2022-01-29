@@ -53,7 +53,47 @@ const sellTrx = async (req, res) => {
     }
     res.send(tx)
 }
+
+const bidTrx = async (req, res) => {
+    //  console.log("makeOrder", req.body);
+    const currency = req.body.currency;
+
+    const txObj = {
+        selectedAccount: req.body.selectedAccount,
+        contractAddress: req.body.contractAddress,
+        erc20: req.body.erc20,
+        amount: req.body.amount,
+        tokenId: req.body.tokenId,
+    }
+    //  console.log("makeOrder", req.body);
+    if (currency == "ETH") {
+        tx = await ethHelper.makeBidTransaction(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.makeBidTransaction(txObj)
+    }
+    res.send(tx);
+}
+
+const bidInfo = async (req, res) => {
+    //  console.log("makeOrder", req.body);
+    const currency = req.body.currency;
+
+    const txObj = {
+        contractAddress: req.body.contractAddress,
+        tokenId: req.body.tokenId,
+    }
+    //  console.log("makeOrder", req.body);
+    if (currency == "ETH") {
+        tx = await ethHelper.getBidInfo(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.getBidInfo(txObj)
+    }
+    res.send(tx);
+}
+
 module.exports = {
     makeTrx,
-    sellTrx
+    sellTrx,
+    bidTrx,
+    bidInfo
 };

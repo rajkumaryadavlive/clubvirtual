@@ -2,6 +2,7 @@ const web3 = require('web3');
 const Tx = require('ethereumjs-tx').Transaction;
 const eth_lazy = require('../contract/eth-lazy')
 const eth_normal = require('../contract/eth-normal')
+const auctionContract = require('../contract/eth-auction')
 
 
 
@@ -17,7 +18,7 @@ const web3js = new web3(
 const makeTransaction = async (data) => {
     try {
 
-       // console.log(data);
+        // console.log(data);
         const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
 
         let contractAddress = "";
@@ -25,42 +26,42 @@ const makeTransaction = async (data) => {
         if (data.contract_type == "lazy") {
             contractAbi = eth_lazy.ABI;
             contractAddress = eth_lazy.contractAddress;
-        }else{
+        } else {
             contractAbi = eth_normal.ABI;
             contractAddress = eth_normal.contractAddress;
         }
         let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-        let amt =  data.amount * 1000000000000000000;
+        let amt = data.amount * 1000000000000000000;
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
-        if(data.functionName == "redeem"){
+        if (data.functionName == "redeem") {
             let voucher = JSON.parse(data.voucher);
-            let minPrice =  voucher.minPrice * 1000000000000000000;
+            let minPrice = voucher.minPrice * 1000000000000000000;
             minPrice = minPrice.toFixed(0);
             minPrice = BigInt(minPrice).toString();
 
             voucher.minPrice = minPrice;
-            
+
             trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, 100).encodeABI();
-        } else{
+        } else {
             trData = nftContract.methods.transferamount(data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
         }
 
         let estimates_gas = await web3js.eth.estimateGas({
             'from': data.selectedAccount,
             'to': contractAddress,
-            'value' : amt,
-            'data' : trData
+            'value': amt,
+            'data': trData
         });
 
         let gasLimit = web3js.utils.toHex(estimates_gas * 2);
         let gasPrice_bal = await web3js.eth.getGasPrice();
         let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
 
-        
+
         // amt = data.amt * 1000000000000000000;
         // amt = amt.toFixed(0);
         // amt = BigInt(amt).toString();
@@ -72,7 +73,7 @@ const makeTransaction = async (data) => {
             // 'gas': 500000,
             'gasPrice': gasPrice,
             'value': amt,
-            'data' : trData,
+            'data': trData,
         };
 
         return tx;
@@ -85,7 +86,7 @@ const makeTransaction = async (data) => {
 
 const makeSellTransaction = async (data) => {
     try {
-       console.log(data);
+        console.log(data);
         const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
 
         let contractAddress = "";
@@ -93,7 +94,7 @@ const makeSellTransaction = async (data) => {
         if (data.contract_type == "lazy") {
             contractAbi = eth_lazy.ABI;
             contractAddress = eth_lazy.contractAddress;
-        }else{
+        } else {
             contractAbi = eth_normal.ABI;
             contractAddress = eth_normal.contractAddress;
         }
@@ -104,14 +105,14 @@ const makeSellTransaction = async (data) => {
         let estimates_gas = await web3js.eth.estimateGas({
             'from': data.selectedAccount,
             'to': contractAddress,
-            'data' : trData
+            'data': trData
         });
 
         let gasLimit = web3js.utils.toHex(estimates_gas * 2);
         let gasPrice_bal = await web3js.eth.getGasPrice();
         let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
 
-        
+
         // amt = data.amt * 1000000000000000000;
         // amt = amt.toFixed(0);
         // amt = BigInt(amt).toString();
@@ -122,7 +123,57 @@ const makeSellTransaction = async (data) => {
             'nonce': nonce,
             // 'gas': 500000,
             'gasPrice': gasPrice,
-            'data' : trData,
+            'data': trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+const makeBidTransaction = async (data) => {
+    try {
+
+        // console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = auctionContract.contractAddress;
+        let contractAbi = auctionContract.ABI;
+
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+
+        let amt = data.amount * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+        let trData = nftContract.methods.makeBid(data.contractAddress, data.tokenId, data.erc20, amt).encodeABI();
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'value': amt,
+            'data': trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'value': amt,
+            'data': trData,
         };
 
         return tx;

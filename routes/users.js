@@ -18,6 +18,10 @@ router.post('/make-trx',  transactionController.makeTrx);
 
 router.post('/make-sell-trx',  transactionController.sellTrx);
 
+router.post('/make-bid-trx',  transactionController.bidTrx);
+
+router.post('/get-bid-info',  transactionController.bidInfo);
+
 router.post('/ipfs-upload',  blockchainController.ipfsUpload);
 
 router.post('/ipfs-upload-new',  blockchainController.ipfsUploadNew);
