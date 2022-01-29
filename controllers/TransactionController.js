@@ -91,9 +91,28 @@ const bidInfo = async (req, res) => {
     res.send(tx);
 }
 
+const auctionSettleTrx = async (req, res) => {
+     console.log("makeOrder", req.body);
+    const currency = req.body.currency;
+
+    const txObj = {
+        selectedAccount : req.body.selectedAccount,
+        contractAddress: req.body.contractAddress,
+        tokenId: req.body.tokenId,
+    }
+    //  console.log("makeOrder", req.body);
+    if (currency == "ETH") {
+        tx = await ethHelper.getBidInfo(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.settleAuctionTrx(txObj)
+    }
+    res.send(tx);
+}
+
 module.exports = {
     makeTrx,
     sellTrx,
     bidTrx,
-    bidInfo
+    bidInfo,
+    auctionSettleTrx
 };

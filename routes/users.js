@@ -22,6 +22,8 @@ router.post('/make-bid-trx',  transactionController.bidTrx);
 
 router.post('/get-bid-info',  transactionController.bidInfo);
 
+router.post('/get-settle-trx',  transactionController.auctionSettleTrx);
+
 router.post('/ipfs-upload',  blockchainController.ipfsUpload);
 
 router.post('/ipfs-upload-new',  blockchainController.ipfsUploadNew);
