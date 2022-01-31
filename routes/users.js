@@ -18,6 +18,8 @@ router.post('/make-trx',  transactionController.makeTrx);
 
 router.post('/make-sell-trx',  transactionController.sellTrx);
 
+router.post('/make-sell-auction-trx',  transactionController.sellAuctionTrx);
+
 router.post('/make-bid-trx',  transactionController.bidTrx);
 
 router.post('/get-bid-info',  transactionController.bidInfo);

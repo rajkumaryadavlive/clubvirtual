@@ -7,15 +7,18 @@ const web3 = require('web3');
 let fs = require("fs");
 var axios = require('axios');
 
+const ADMIN_ADDRESS = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
+const ADMIN_KEY = "9f09d101cd3f32424b7e842b83048ffe06dbee6365026ac7bea0db0c25d2b5a3";
+
 const transferNFT = async (req, res) => {
     console.log("Post Method transferNFT");
     console.log("req body", req.body);
-    let address_from = req.body.address_from;
+    let address_from = ADMIN_ADDRESS;//req.body.address_from;
     let address_to = req.body.address_to;
     let tokenid = req.body.tokenid;
     let network_type = req.body.network_type;
     let contract_type = req.body.contract_type;
-    let privatekey = req.body.privatekey;
+    let privatekey = ADMIN_KEY;//req.body.privatekey;
     if (network_type == "ETH") {
         let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey)
         let hash = transfer.transactionHash

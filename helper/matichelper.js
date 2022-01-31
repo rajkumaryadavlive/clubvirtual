@@ -3,11 +3,12 @@ const Tx = require('ethereumjs-tx').Transaction;
 const Common = require('ethereumjs-common');
 const matic_lazy = require('../contract/matic-lazy')
 const matic_normal = require('../contract/matic-normal')
+const auctionContract = require('../contract/matic-auction')
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
-        "https://rpc-mainnet.matic.network"
-    //   "https://rpc-mumbai.maticvigil.com/"
+        // "https://rpc-mainnet.matic.network"
+      "https://rpc-mumbai.maticvigil.com/"
     // "https://polygon-rpc.com/"
     //   "https://testnet.matic.network"
     )
@@ -22,11 +23,11 @@ const makeTransaction = async (data) => {
         let contractAddress = "";
         let contractAbi = "";
         if (data.contract_type == "lazy") {
-            contractAbi = eth_lazy.ABI;
-            contractAddress = eth_lazy.contractAddress;
+            contractAbi = matic_lazy.ABI;
+            contractAddress = matic_lazy.contractAddress;
         }else{
-            contractAbi = eth_normal.ABI;
-            contractAddress = eth_normal.contractAddress;
+            contractAbi = matic_normal.ABI;
+            contractAddress = matic_normal.contractAddress;
         }
         let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
@@ -90,11 +91,11 @@ const makeSellTransaction = async (data) => {
         let contractAddress = "";
         let contractAbi = "";
         if (data.contract_type == "lazy") {
-            contractAbi = eth_lazy.ABI;
-            contractAddress = eth_lazy.contractAddress;
+            contractAbi = matic_lazy.ABI;
+            contractAddress = matic_lazy.contractAddress;
         }else{
-            contractAbi = eth_normal.ABI;
-            contractAddress = eth_normal.contractAddress;
+            contractAbi = matic_normal.ABI;
+            contractAddress = matic_normal.contractAddress;
         }
         let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
@@ -131,6 +132,60 @@ const makeSellTransaction = async (data) => {
     }
 }
 
+const makeBidTransaction = async (data) => {
+    try {
+        console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = auctionContract.contractAddress;
+        let contractAbi = auctionContract.ABI;
+
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let amt = data.amount * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+        let trData = nftContract.methods.makeBid(data.contractAddress, data.tokenId, data.erc20, "0").encodeABI();
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'value': amt,
+            'data': trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'value': amt,
+            'data': trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+const getBidInfo = async (data) => {
+    try {
+        let Contract = new web3js.eth.Contract(auctionContract.ABI, auctionContract.contractAddress);
+
+        let res = Contract.methods.nftContractAuctions(data.contractAddress, data.tokenId).call();
+        return res;
+    } catch (error) {
+        console.log("errror", error);
+        return null;
+    }
+}
 
 const maticTransfer =  async (address_from, address_to, tokenid, contract_type, privatekey) => {
     let coinABI = "";
@@ -178,7 +233,12 @@ const maticTransfer =  async (address_from, address_to, tokenid, contract_type, 
     }
     
     // let transaction = new Tx(rawTransaction, { chain:'ropsten' });
-    let transaction = new Tx(rawTransaction, { chain:'80001' });
+    const common = Common.default.forCustomChain('mainnet', {
+        name: 'Matic',
+        networkId: 80001,
+        chainId: 80001
+    }, 'petersburg');
+    let transaction = new Tx(rawTransaction, { common });
     transaction.sign(privateKey);
     let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'));
     return hash;
@@ -243,5 +303,7 @@ module.exports = {
     maticTransfer,
     Adminmatictransfer,
     makeTransaction,
-    makeSellTransaction
+    makeSellTransaction,
+    getBidInfo,
+    makeBidTransaction
 }
