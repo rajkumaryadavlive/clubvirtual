@@ -76,6 +76,8 @@ const sellAuctionTrx = async (req, res) => {
         amount: req.body.amount,
         auctionDuration: req.body.auctionDuration,
         tokenId: req.body.tokenId,
+        royalty:req.body.royalty,
+        comission:req.body.comission,
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
@@ -141,7 +143,7 @@ const auctionSettleTrx = async (req, res) => {
     }
     //  console.log("makeOrder", req.body);
     if (currency == "ETH") {
-        tx = await ethHelper.getBidInfo(txObj)
+        tx = await ethHelper.settleAuctionTrx(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.settleAuctionTrx(txObj)
     }  else if (currency == "BNB") {
