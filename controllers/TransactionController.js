@@ -7,7 +7,7 @@ const web3 = require('web3');
 const req = require('express/lib/request');
 
 const makeTrx = async (req, res) => {
-    console.log("makeOrder", req.body);
+    // console.log("makeOrder", req.body);
     const amount = req.body.amount;
     const wallet_address = req.body.address;
     const currency = req.body.currency;
@@ -23,6 +23,8 @@ const makeTrx = async (req, res) => {
         adminFee: req.body.adminFee,
         admin: req.body.admin,
         functionName: req.body.functionName,
+        nft_owner: req.body.nft_owner,
+        royalty: req.body.royalty,
 
     }
 
@@ -81,6 +83,8 @@ const sellAuctionTrx = async (req, res) => {
         tx = await ethHelper.makeSellAuctionTransaction(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.makeSellAuctionTransaction(txObj)
+    } else if (currency == "MATIC") {
+        tx = await maticHelper.makeSellAuctionTransaction(txObj)
     }
     res.send(tx)
 }
@@ -139,6 +143,8 @@ const auctionSettleTrx = async (req, res) => {
     if (currency == "ETH") {
         tx = await ethHelper.getBidInfo(txObj)
     } else if (currency == "BNB") {
+        tx = await bscHelper.settleAuctionTrx(txObj)
+    }  else if (currency == "BNB") {
         tx = await bscHelper.settleAuctionTrx(txObj)
     }
     res.send(tx);

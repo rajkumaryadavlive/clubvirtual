@@ -34,6 +34,11 @@ const makeTransaction = async (data) => {
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
+        let adminFee = data.adminFee * 10000000000;
+        let royalty = data.royalty * 10000000000;
+        royalty = royalty.toFixed(0);
+        adminFee = adminFee.toFixed(0);
+
         if (data.functionName == "redeem") {
             let voucher = JSON.parse(data.voucher);
             let minPrice = voucher.minPrice * 1000000000000000000;
@@ -42,9 +47,9 @@ const makeTransaction = async (data) => {
 
             voucher.minPrice = minPrice;
 
-            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, 100).encodeABI();
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
         } else {
-            trData = nftContract.methods.transferamount(data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
+            trData = nftContract.methods.transferamount(data.nft_creator, data.admin, data.nft_owner, amt, adminFee,royalty).encodeABI();
         }
 
         let estimates_gas = await web3js.eth.estimateGas({
