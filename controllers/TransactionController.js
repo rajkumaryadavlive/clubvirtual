@@ -7,7 +7,7 @@ const web3 = require('web3');
 const req = require('express/lib/request');
 
 const makeTrx = async (req, res) => {
-    // console.log("makeOrder", req.body);
+    console.log("makeOrder", req.body);
     const amount = req.body.amount;
     const wallet_address = req.body.address;
     const currency = req.body.currency;
