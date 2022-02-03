@@ -78,6 +78,7 @@ const sellAuctionTrx = async (req, res) => {
         tokenId: req.body.tokenId,
         royalty:req.body.royalty,
         comission:req.body.comission,
+        startTime:req.body.startTime
     }
     let tx = null;
     //  console.log("makeOrder", req.body);

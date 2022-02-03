@@ -153,7 +153,7 @@ const makeSellAuctionTransaction = async (data) => {
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
-        let trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId,data.erc20,amt,(data.royalty*100),(data.comission*100),data.auctionDuration,10*100,10).encodeABI();
+        let trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId,data.erc20,amt,(data.royalty*100),(data.comission*100),data.auctionDuration,10*100,data.startTime).encodeABI();
 
         let estimates_gas = await web3js.eth.estimateGas({
             'from': data.selectedAccount,
