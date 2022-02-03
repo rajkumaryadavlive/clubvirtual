@@ -147,8 +147,8 @@ const auctionSettleTrx = async (req, res) => {
         tx = await ethHelper.settleAuctionTrx(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.settleAuctionTrx(txObj)
-    }  else if (currency == "BNB") {
-        tx = await bscHelper.settleAuctionTrx(txObj)
+    }  else if (currency == "MATIC") {
+        tx = await maticHelper.settleAuctionTrx(txObj)
     }
     res.send(tx);
 }
