@@ -25,6 +25,7 @@ const makeTrx = async (req, res) => {
         functionName: req.body.functionName,
         nft_owner: req.body.nft_owner,
         royalty: req.body.royalty,
+        standard: req.body.standard,
 
     }
 
@@ -51,6 +52,7 @@ const sellTrx = async (req, res) => {
         contract_type: req.body.contract_type,
         transferTo: req.body.transferTo,
         tokenId: req.body.tokenId,
+        standard: req.body.standard,
     }
     let tx = null;
     //  console.log("makeOrder", req.body);

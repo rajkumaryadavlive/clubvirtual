@@ -18,23 +18,25 @@ const transferNFT = async (req, res) => {
     let tokenid = req.body.tokenid;
     let network_type = req.body.network_type;
     let contract_type = req.body.contract_type;
+    let standard = req.body.standard;
+
     let privatekey = ADMIN_KEY;//req.body.privatekey;
     if (network_type == "ETH") {
-        let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey)
+        let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
         res.send({ hash, status })
     }
     if (network_type == "BNB") {
-        let transfer = await BNBTransfer(address_from, address_to, tokenid, contract_type, privatekey)
+        let transfer = await BNBTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
         res.send({ hash, status })
     }
     if (network_type == "MATIC") {
-        let transfer = await maticTransfer(address_from, address_to, tokenid, contract_type, privatekey)
+        let transfer = await maticTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
