@@ -20,7 +20,7 @@ const web3js = new web3(
 const makeTransaction = async (data) => {
     try {
 
-        console.log(data);
+        // console.log(data);
         const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
 
         let contractAddress = "";
@@ -64,7 +64,7 @@ const makeTransaction = async (data) => {
 
             voucher.minPrice = minPrice;
 
-            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, adminFee).encodeABI();
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, data.adminFee).encodeABI();
         } else {
             trData = nftContract.methods.transferamount(data.nft_creator, data.admin, data.nft_owner, amt, adminFee, royalty).encodeABI();
         }
