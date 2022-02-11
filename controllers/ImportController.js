@@ -4,6 +4,10 @@ const maticAuction = require('../contract/matic-auction')
 const ethAuction = require('../contract/eth-auction')
 const bscAuction = require('../contract/bsc-auction')
 
+let ethRpc = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
+let bscRpc = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+let maticRpc = "https://matic-testnet-archive-rpc.bwarelabs.com/";
+
 const getCollection = async (req, res) => {
     console.log("makeOrder", req.body);
     const contract_address = req.body.contract_addreess;
@@ -14,14 +18,14 @@ const getCollection = async (req, res) => {
     let apiUrl = "";
 
     if (type == "ETH") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
+        providerUrl = ethRpc;
         apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = bscRpc;
+        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
-        providerUrl = "https://rpc-mumbai.maticvigil.com/";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = maticRpc;
+        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
     const web3js = new web3(
@@ -30,14 +34,22 @@ const getCollection = async (req, res) => {
         )
     );
 
-    console.log(apiUrl);
+    console.log(providerUrl);
     let result = await axios.get(apiUrl);
+    // console.log(result);
+    if(result.data.status != 1){
+        res.send('0')
+    }
 
     let contractAbi = result.data.result;
+    
     contractAbi = JSON.parse(contractAbi);
+    console.log(wallet_addreess);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
 
     let info = await nftContract.methods.tokensOwned(wallet_addreess).call();
+
+    console.log(info);
 
     info = JSON.stringify(info);
     res.send(info)
@@ -53,14 +65,14 @@ const getMetadata = async (req, res) => {
     let apiUrl = "";
 
     if (type == "ETH") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
+        providerUrl = ethRpc;
         apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = bscRpc;
+        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
-        providerUrl = "https://rpc-mumbai.maticvigil.com/";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = maticRpc;
+        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
     const web3js = new web3(
@@ -69,10 +81,13 @@ const getMetadata = async (req, res) => {
         )
     );
 
-    console.log(apiUrl);
+    // console.log("apiUrl");
+    // console.log(apiUrl);
     let result = await axios.get(apiUrl);
+    // console.log(result);
     let contractAbi = result.data.result;
-
+        
+    // console.log(contractAbi);
     contractAbi = JSON.parse(contractAbi);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
 
@@ -103,23 +118,21 @@ const getCollectionTrx = async (req, res) => {
         token_price.push(amt);
     });
     
-    console.log(token_price);
-    console.log(token_ids);
     let providerUrl = "";
     let contractAddress = "";
     let contractAbi = "";
 
     if (type == "ETH") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
+        providerUrl = ethRpc;
         contractAddress = ethAuction.contractAddress;
         contractAbi = ethAuction.ABI;
     } else if (type == "BNB") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
-        contractAddress = bscAuction;
+        providerUrl = bscRpc;
+        contractAddress = bscAuction.contractAddress;
         contractAbi = bscAuction.ABI;
     } else if (type == "MATIC") {
-        providerUrl = "https://rpc-mumbai.maticvigil.com/";
-        contractAddress = maticAuction;
+        providerUrl = maticRpc;
+        contractAddress = maticAuction.contractAddress;
         contractAbi = maticAuction.ABI;
     }
 
@@ -155,14 +168,14 @@ const getApproval = async (req, res) => {
     let apiUrl = "";
 
     if (type == "ETH") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
+        providerUrl = ethRpc;
         apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
-        providerUrl = "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = bscRpc;
+        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
-        providerUrl = "https://rpc-mumbai.maticvigil.com/";
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        providerUrl = maticRpc;
+        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
     const web3js = new web3(
@@ -180,6 +193,8 @@ const getApproval = async (req, res) => {
 
     let v = await web3js.eth.getTransactionCount(selectedAccount);
 
+    let isApproved = await nftContract.methods.isApprovedForAll(selectedAccount,sell_contract).call();
+
     let rawTransaction1 = {
         "from": selectedAccount,
         // "gasPrice": gasPrice,
@@ -188,8 +203,13 @@ const getApproval = async (req, res) => {
         "data": nftContract.methods.setApprovalForAll(sell_contract, 1).encodeABI(),
         "nonce": web3js.utils.toHex(v)
     };
-
-    res.send(rawTransaction1)
+    console.log(isApproved);
+    let r = {
+        'trx' : rawTransaction1,
+        'isApproved':isApproved
+    };
+    // rawTransaction1 = JSON.stringify(rawTransaction1);
+    res.send(r);
 }
 
 module.exports = {

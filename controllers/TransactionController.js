@@ -42,6 +42,44 @@ const makeTrx = async (req, res) => {
     res.send(tx)
 }
 
+const makeBatchTrx = async (req, res) => {
+    console.log("makeOrder", req.body);
+    const amount = req.body.amount;
+    const wallet_address = req.body.address;
+    const currency = req.body.currency;
+    adminAddress = req.body.to;
+    let tx = "";
+
+    const txObj = {
+        amount: req.body.amount,
+        selectedAccount: req.body.selectedAccount,
+        contract_type: req.body.contract_type,
+        voucher: req.body.voucher,
+        nft_creator: req.body.nft_creator,
+        adminFee: req.body.adminFee,
+        admin: req.body.admin,
+        functionName: req.body.functionName,
+        nft_owner: req.body.nft_owner,
+        royalty: req.body.royalty,
+        standard: req.body.standard,
+        nft_contract_address: req.body.nft_contract_address,
+        token_id: req.body.token_id,
+
+    }
+
+    if (currency == "ETH") {
+        tx = await ethHelper.makeBatchTransaction(txObj)
+
+    } else if (currency == "BNB") {
+        tx = await bscHelper.makeBatchTransaction(txObj)
+    }
+    else if (currency == "MATIC") {
+        tx = await maticHelper.makeBatchTransaction(txObj)
+    }
+
+    res.send(tx)
+}
+
 const sellTrx = async (req, res) => {
     console.log("makeOrder", req.body);
 
@@ -161,5 +199,6 @@ module.exports = {
     bidTrx,
     bidInfo,
     auctionSettleTrx,
-    sellAuctionTrx
+    sellAuctionTrx,
+    makeBatchTrx
 };

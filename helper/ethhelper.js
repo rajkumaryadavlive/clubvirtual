@@ -102,6 +102,59 @@ const makeTransaction = async (data) => {
     }
 }
 
+const makeBatchTransaction = async (data) => {
+    try {
+
+        // console.log(data);
+        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let contractAddress = auctionContract.contractAddress;
+        let contractAbi = auctionContract.ABI;
+        
+        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = "";
+        let amt = data.amount * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+
+        let adminFee = data.adminFee * 100;
+        adminFee = adminFee.toFixed(0);
+        // adminFee = BigInt(adminFee).toString();
+        trData = nftContract.methods.buyNFT(data.nft_contract_address, data.token_id, adminFee).encodeABI();
+
+        let estimates_gas = await web3js.eth.estimateGas({
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'value': amt,
+            'data': trData
+        });
+
+        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3js.eth.getGasPrice();
+        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+
+        // amt = data.amt * 1000000000000000000;
+        // amt = amt.toFixed(0);
+        // amt = BigInt(amt).toString();
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'value': amt,
+            'data': trData,
+        };
+
+        return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
 
 const makeSellTransaction = async (data) => {
     try {
@@ -499,5 +552,6 @@ module.exports = {
     makeSellAuctionTransaction,
     getBidInfo,
     makeBidTransaction,
-    settleAuctionTrx
+    settleAuctionTrx,
+    makeBatchTransaction
 }
