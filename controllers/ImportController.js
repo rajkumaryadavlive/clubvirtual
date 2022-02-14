@@ -192,6 +192,10 @@ const getSingleCollectionTrx = async (req, res) => {
         )
     );
 
+    let amt = token_price * 1000000000000000000;
+        amt = amt.toFixed(0);
+        amt = BigInt(amt).toString();
+
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
     let v = await web3js.eth.getTransactionCount(selectedAccount);
@@ -199,7 +203,7 @@ const getSingleCollectionTrx = async (req, res) => {
     let rawTransaction1 = {
         "from": selectedAccount,
         "to": contractAddress,
-        "data": nftContract.methods.createSale(contract_address, token_ids,erc20,token_price).encodeABI(),
+        "data": nftContract.methods.createSale(contract_address, token_ids,erc20,amt).encodeABI(),
         "nonce": web3js.utils.toHex(v)
     };
 
