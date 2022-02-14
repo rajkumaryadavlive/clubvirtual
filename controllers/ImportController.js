@@ -84,7 +84,7 @@ const getMetadata = async (req, res) => {
     // console.log("apiUrl");
     // console.log(apiUrl);
     let result = await axios.get(apiUrl);
-    // console.log(result);
+    console.log(result);
     let contractAbi = result.data.result;
         
     // console.log(contractAbi);
