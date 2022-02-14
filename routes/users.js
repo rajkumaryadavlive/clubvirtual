@@ -45,5 +45,7 @@ router.post('/get-approval',  importController.getApproval);
 
 router.post('/get-collection-trx',  importController.getCollectionTrx);
 
+router.post('/get-single-collection-trx',  importController.getSingleCollectionTrx);
+
 
 module.exports = router;

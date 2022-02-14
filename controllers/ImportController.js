@@ -156,6 +156,56 @@ const getCollectionTrx = async (req, res) => {
     res.send(rawTransaction1)
 }
 
+const getSingleCollectionTrx = async (req, res) => {
+    console.log("makeOrder", req.body);
+    const contract_address = req.body.contractAddress;
+    let token_ids = req.body.tokenIds;
+    let token_price = req.body.priceArr;
+    const erc20 = req.body.erc20;
+    const selectedAccount = req.body.selectedAccount;
+
+    const type = req.body.type;
+
+
+    
+    let providerUrl = "";
+    let contractAddress = "";
+    let contractAbi = "";
+
+    if (type == "ETH") {
+        providerUrl = ethRpc;
+        contractAddress = ethAuction.contractAddress;
+        contractAbi = ethAuction.ABI;
+    } else if (type == "BNB") {
+        providerUrl = bscRpc;
+        contractAddress = bscAuction.contractAddress;
+        contractAbi = bscAuction.ABI;
+    } else if (type == "MATIC") {
+        providerUrl = maticRpc;
+        contractAddress = maticAuction.contractAddress;
+        contractAbi = maticAuction.ABI;
+    }
+
+    const web3js = new web3(
+        new web3.providers.HttpProvider(
+            providerUrl
+        )
+    );
+
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+    let v = await web3js.eth.getTransactionCount(selectedAccount);
+
+    let rawTransaction1 = {
+        "from": selectedAccount,
+        "to": contractAddress,
+        "data": nftContract.methods.createSale(contract_address, token_ids,erc20,token_price).encodeABI(),
+        "nonce": web3js.utils.toHex(v)
+    };
+
+    res.send(rawTransaction1)
+}
+
 const getApproval = async (req, res) => {
     console.log("makeOrder", req.body);
     const contract_address = req.body.contract_addreess;
@@ -216,5 +266,6 @@ module.exports = {
     getCollection,
     getMetadata,
     getApproval,
-    getCollectionTrx
+    getCollectionTrx,
+    getSingleCollectionTrx
 };
