@@ -256,7 +256,7 @@ const getApproval = async (req, res) => {
     if(result.data.status != 1){
         res.send('0')
     }
-
+    console.log(result);
     let contractAbi = result.data.data.abi;
 
     contractAbi = JSON.parse(contractAbi);
