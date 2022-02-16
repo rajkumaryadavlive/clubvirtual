@@ -256,8 +256,8 @@ const getApproval = async (req, res) => {
     if(result.data.status != 1){
         res.send('0')
     }
-    console.log(result);
-    let contractAbi = result.data.data.abi;
+    // console.log(result);
+    let contractAbi = result.data.data.contract_abi;
 
     contractAbi = JSON.parse(contractAbi);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
