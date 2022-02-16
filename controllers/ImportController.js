@@ -15,7 +15,7 @@ const getCollection = async (req, res) => {
     const type = req.body.type;
 
     let providerUrl = "";
-    let apiUrl = "http://127.0.0.1:8001/api/get-abi";
+    let apiUrl = "http://18.223.117.55/api/get-abi";
 
     if (type == "ETH") {
         providerUrl = ethRpc;
@@ -239,7 +239,7 @@ const getApproval = async (req, res) => {
         // apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
-    let apiUrl = "http://127.0.0.1:8001/api/get-abi";
+    let apiUrl = "http://18.223.117.55/api/get-abi";
     const web3js = new web3(
         new web3.providers.HttpProvider(
             providerUrl
