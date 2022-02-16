@@ -15,17 +15,17 @@ const getCollection = async (req, res) => {
     const type = req.body.type;
 
     let providerUrl = "";
-    let apiUrl = "";
+    let apiUrl = "http://127.0.0.1:8001/api/get-abi";
 
     if (type == "ETH") {
         providerUrl = ethRpc;
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
         providerUrl = bscRpc;
-        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
         providerUrl = maticRpc;
-        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
     const web3js = new web3(
@@ -34,17 +34,19 @@ const getCollection = async (req, res) => {
         )
     );
 
-    console.log(providerUrl);
-    let result = await axios.get(apiUrl);
+    let result = await axios.post(apiUrl,{
+        blockchain:type,
+        address:contract_address
+    });
     // console.log(result);
     if(result.data.status != 1){
         res.send('0')
     }
 
-    let contractAbi = result.data.result;
+    let contractAbi = result.data.data.abi;
     
     contractAbi = JSON.parse(contractAbi);
-    console.log(wallet_addreess);
+    console.log(contractAbi);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
 
     let info = await nftContract.methods.tokensOwned(wallet_addreess).call();
@@ -62,19 +64,18 @@ const getMetadata = async (req, res) => {
     const type = req.body.type;
 
     let providerUrl = "";
-    let apiUrl = "";
 
     if (type == "ETH") {
         providerUrl = ethRpc;
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
         providerUrl = bscRpc;
-        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
         providerUrl = maticRpc;
-        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
-
+    let apiUrl = "http://127.0.0.1:8001/api/get-abi";
     const web3js = new web3(
         new web3.providers.HttpProvider(
             providerUrl
@@ -83,11 +84,17 @@ const getMetadata = async (req, res) => {
 
     // console.log("apiUrl");
     // console.log(apiUrl);
-    let result = await axios.get(apiUrl);
-    console.log(result);
-    let contractAbi = result.data.result;
-        
-    // console.log(contractAbi);
+    let result = await axios.post(apiUrl,{
+        blockchain:type,
+        address:contract_address
+    });
+    // console.log(result);
+    if(result.data.status != 1){
+        res.send('0')
+    }
+
+    let contractAbi = result.data.data.abi;
+
     contractAbi = JSON.parse(contractAbi);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
 
@@ -219,28 +226,38 @@ const getApproval = async (req, res) => {
     const type = req.body.type;
 
     let providerUrl = "";
-    let apiUrl = "";
+    // let apiUrl = "";
 
     if (type == "ETH") {
         providerUrl = ethRpc;
-        apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-ropsten.etherscan.io/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "BNB") {
         providerUrl = bscRpc;
-        apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api.bscscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     } else if (type == "MATIC") {
         providerUrl = maticRpc;
-        apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
+        // apiUrl = `https://api-testnet.polygonscan.com/api?module=contract&action=getabi&address=${contract_address}&apikey=DANQTF6918JFWUEDUS7YEVNMITR7PCH5EA`;
     }
 
+    let apiUrl = "http://127.0.0.1:8001/api/get-abi";
     const web3js = new web3(
         new web3.providers.HttpProvider(
             providerUrl
         )
     );
 
-    console.log(apiUrl);
-    let result = await axios.get(apiUrl);
-    let contractAbi = result.data.result;
+    // console.log("apiUrl");
+    // console.log(apiUrl);
+    let result = await axios.post(apiUrl,{
+        blockchain:type,
+        address:contract_address
+    });
+    // console.log(result);
+    if(result.data.status != 1){
+        res.send('0')
+    }
+
+    let contractAbi = result.data.data.abi;
 
     contractAbi = JSON.parse(contractAbi);
     let nftContract = new web3js.eth.Contract(contractAbi, contract_address);
