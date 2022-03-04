@@ -5,7 +5,7 @@ const eth_normal = require('../contract/eth-normal')
 const lazy_1155 = require('../contract/1155/eth-lazy')
 const normal_1155 = require('../contract/1155/eth-normal')
 const auctionContract = require('../contract/eth-auction')
-
+var axios = require('axios');
 
 
 
@@ -110,7 +110,7 @@ const makeBatchTransaction = async (data) => {
 
         let contractAddress = auctionContract.contractAddress;
         let contractAbi = auctionContract.ABI;
-        
+
         let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
@@ -366,8 +366,63 @@ const settleAuctionTrx = async (data) => {
         return null;
     }
 }
+const transferNftToOwner = async (data) => {
+    let contractAbi = "";
+    let contractAddress = data.contractAddress;
+    let apiUrl = "http://18.223.117.55/api/get-abi";
+    let result = await axios.post(apiUrl, {
+        blockchain: 'ETH',
+        address: data.contractAddress
+    });
 
-const ETHTransfer = async (address_from, address_to, tokenid, contract_type, privatekey,standard) => {
+    if (result.data.status != 1) {
+        res.send('0')
+    }
+
+    contractAbi = result.data.data.contract_abi;
+    
+    contractAbi = JSON.parse(contractAbi);
+
+    let privatekey = data.adminKey;
+    console.log(privatekey);
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+    if (privatekey.length > 64) {
+        let num = privatekey.length - 64;
+        privatekey = privatekey.slice(num);
+    }
+    const adminKey = Buffer.from(privatekey, 'hex');
+    
+    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    // let estimates_gas = await web3js.eth.estimateGas({
+    //     'from': data.adminAddress,
+    //     'to': contractAddress,
+    //     'data': trData
+    // });
+    
+    let gasPrice_bal = await web3js.eth.getGasPrice();
+    let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
+    let v = await web3js.eth.getTransactionCount(data.adminAddress)
+
+    let rawTransaction = {
+        "from": data.adminAddress,
+        // "chainId" : web3js.utils.toHex('1221'),
+        "gasPrice": gasPrice,
+        // "gasLimit": gasLimit,
+        'gas': 5000000,
+        "to": contractAddress,
+        "data": trData,
+        "nonce": web3js.utils.toHex(v)
+
+    }
+    
+    let transaction = new Tx(rawTransaction, { chain: 'ropsten' });
+    transaction.sign(adminKey);
+    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+    return hash;
+
+}
+
+const ETHTransfer = async (address_from, address_to, tokenid, contract_type, privatekey, standard) => {
     try {
         let coinABI = "";
         let coinAddress = "";
@@ -403,8 +458,8 @@ const ETHTransfer = async (address_from, address_to, tokenid, contract_type, pri
         let trData = "";
         if (standard == "721") {
             trData = tokenContract.methods.transferFrom(address_from, address_to, tokenid).encodeABI();
-        } else{
-            trData = tokenContract.methods.transferFrom(address_from, address_to, tokenid,1).encodeABI();
+        } else {
+            trData = tokenContract.methods.transferFrom(address_from, address_to, tokenid, 1).encodeABI();
         }
         let estimates_gas = await web3js.eth.estimateGas({
             from: address_from,
@@ -553,5 +608,6 @@ module.exports = {
     getBidInfo,
     makeBidTransaction,
     settleAuctionTrx,
-    makeBatchTransaction
+    makeBatchTransaction,
+    transferNftToOwner
 }

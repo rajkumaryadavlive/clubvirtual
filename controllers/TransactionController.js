@@ -6,6 +6,9 @@ const ipfsAPI = require("ipfs-api");
 const web3 = require('web3');
 const req = require('express/lib/request');
 
+const ADMIN_ADDRESS = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
+const ADMIN_KEY = "9f09d101cd3f32424b7e842b83048ffe06dbee6365026ac7bea0db0c25d2b5a3";
+
 const makeTrx = async (req, res) => {
     console.log("makeOrder", req.body);
     const amount = req.body.amount;
@@ -193,6 +196,25 @@ const auctionSettleTrx = async (req, res) => {
     res.send(tx);
 }
 
+const transferNftToOwner = async (req, res) => {
+    const currency = req.body.currency;
+    const txObj = {
+        selectedAccount: req.body.selectedAccount,
+        tokenId: req.body.tokenId,
+        contractAddress:req.body.contractAddress,
+        adminAddress:ADMIN_ADDRESS,
+        adminKey:ADMIN_KEY
+    }
+    console.log(txObj);
+    if (currency == "ETH") {
+        tx = await ethHelper.transferNftToOwner(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.transferNftToOwner(txObj)
+    }  else if (currency == "MATIC") {
+        tx = await maticHelper.transferNftToOwner(txObj)
+    }
+    res.send(tx);
+};
 module.exports = {
     makeTrx,
     sellTrx,
@@ -200,5 +222,6 @@ module.exports = {
     bidInfo,
     auctionSettleTrx,
     sellAuctionTrx,
-    makeBatchTrx
+    makeBatchTrx,
+    transferNftToOwner
 };

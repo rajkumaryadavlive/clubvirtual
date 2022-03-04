@@ -6,6 +6,7 @@ const matic_normal = require('../contract/matic-normal')
 const lazy_1155 = require('../contract/1155/matic-lazy')
 const normal_1155 = require('../contract/1155/matic-normal')
 const auctionContract = require('../contract/matic-auction')
+var axios = require('axios');
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
@@ -351,6 +352,64 @@ const getBidInfo = async (data) => {
     }
 }
 
+const transferNftToOwner = async (data) => {
+    let contractAbi = "";
+    let contractAddress = "";
+    let apiUrl = "http://18.223.117.55/api/get-abi";
+    let result = await axios.post(apiUrl, {
+        blockchain: 'ETH',
+        address: data.contractAddress
+    });
+
+    if (result.data.status != 1) {
+        res.send('0')
+    }
+
+    contractAbi = result.data.data.abi;
+
+    contractAbi = JSON.parse(contractAbi);
+
+    let privatekey = data.adminKey;
+
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+    if (privatekey.length > 64) {
+        let num = privatekey.length - 64;
+        privatekey = privatekey.slice(num);
+    }
+    const privateKey = Buffer.from(privatekey, 'hex');
+    console.log("privateKey", privateKey);
+
+    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId);
+    let estimates_gas = await web3js.eth.estimateGas({
+        'from': data.adminAddress,
+        'to': contractAddress,
+        'data': trData
+    });
+
+    let gasPrice_bal = await web3js.eth.getGasPrice();
+    let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
+    let v = await web3js.eth.getTransactionCount(address_from)
+
+    let rawTransaction = {
+        "from": data.adminAddress,
+        // "chainId" : web3js.utils.toHex('1221'),
+        "gasPrice": gasPrice,
+        // "gasLimit": gasLimit,
+        'gas': 5000000,
+        "to": contractAddress,
+        "data": trData,
+        "nonce": web3js.utils.toHex(v)
+
+    }
+    console.log(rawTransaction);
+    return ;
+    let transaction = new Tx(rawTransaction, { chain: 'ropsten' });
+    transaction.sign(privateKey);
+    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+    return hash;
+
+}
+
 const maticTransfer = async (address_from, address_to, tokenid, contract_type, privatekey, standard) => {
     let coinABI = "";
     let coinAddress = "";
@@ -485,5 +544,6 @@ module.exports = {
     makeBidTransaction,
     makeSellAuctionTransaction,
     settleAuctionTrx,
-    makeBatchTransaction
+    makeBatchTransaction,
+    transferNftToOwner
 }

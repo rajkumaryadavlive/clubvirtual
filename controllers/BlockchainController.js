@@ -119,7 +119,7 @@ const ipfsUploadNew = async (req, res) => {
     //     })
     // })
     console.log(end);
-    for(let f=start;f<=10000;f++){
+    for(let f=start;f<=9;f++){
         // console.log(f);
         arrayOfFiles.push({
             path: Math.random(),
@@ -139,7 +139,7 @@ const ipfsUploadNew = async (req, res) => {
                 ipfshash[index] = element.hash;
             })
             console.log(ipfshash);
-            axios.post('http://18.223.117.55/api/update-ipfs-link', {
+            axios.post('http://127.0.0.1:8001/api/update-ipfs-link', {
                     hash:ipfshash,
                     start:start
                 })
@@ -175,7 +175,7 @@ const ipfsUploadWithAttr = async (req, res) => {
         },
       };
       let response = await axios(config);
-      console.log(response);
+    //   console.log(response);
       let start = response.data.start;
       response = response.data.data;
       response.forEach(async(element,index) => {
@@ -201,7 +201,7 @@ const ipfsUploadWithAttr = async (req, res) => {
                 ipfshash[index] = element.hash;
             })
             console.log(ipfshash);
-            axios.post('http://127.0.0.1:8000/api/update-ipfs-metadata', {
+            axios.post('http://127.0.0.1:8001/api/update-ipfs-metadata', {
                     hash:ipfshash,
                     start:start
                 })

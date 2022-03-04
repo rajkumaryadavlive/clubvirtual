@@ -47,5 +47,6 @@ router.post('/get-collection-trx',  importController.getCollectionTrx);
 
 router.post('/get-single-collection-trx',  importController.getSingleCollectionTrx);
 
+router.post('/remove-from-sale',  transactionController.transferNftToOwner);
 
 module.exports = router;
