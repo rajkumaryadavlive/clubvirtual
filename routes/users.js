@@ -49,4 +49,10 @@ router.post('/get-single-collection-trx',  importController.getSingleCollectionT
 
 router.post('/remove-from-sale',  transactionController.transferNftToOwner);
 
+router.post('/remove-from-auction',  transactionController.removeAuction);
+
+router.post('/transfer-to-admin',  transactionController.transferToAdmin);
+
+router.post('/uploadFileToIpfs',  blockchainController.uploadFileToIpfs);
+
 module.exports = router;

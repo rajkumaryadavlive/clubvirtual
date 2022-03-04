@@ -22,21 +22,21 @@ const transferNFT = async (req, res) => {
 
     let privatekey = ADMIN_KEY;//req.body.privatekey;
     if (network_type == "ETH") {
-        let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
+        let transfer = await ETHTransfer(address_from, address_to, tokenid, contract_type, privatekey, standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
         res.send({ hash, status })
     }
     if (network_type == "BNB") {
-        let transfer = await BNBTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
+        let transfer = await BNBTransfer(address_from, address_to, tokenid, contract_type, privatekey, standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
         res.send({ hash, status })
     }
     if (network_type == "MATIC") {
-        let transfer = await maticTransfer(address_from, address_to, tokenid, contract_type, privatekey,standard)
+        let transfer = await maticTransfer(address_from, address_to, tokenid, contract_type, privatekey, standard)
         let hash = transfer.transactionHash
         let status = "1";
         console.log("transfer", transfer);
@@ -77,6 +77,32 @@ const admintransfer = async (req, res) => {
     }
 }
 
+const uploadFileToIpfs = async (req, res) => {
+    console.log(req.body);
+    //res.redirect(`/addfile/${req.file.filename}`)
+    ////////////////////
+    let testFile = fs.readFileSync(`./${req.file.filename}`);
+    //Creating buffer for ipfs function to add file to the system
+
+    const path = `./${req.file.filename}`;
+
+    try {
+        fs.unlinkSync(path);
+        //file removed
+    } catch (err) {
+        console.error(err);
+    }
+
+    let testBuffer = new Buffer(testFile);
+
+    ipfs.files.add(testBuffer, async (err, file) => {
+        if (err) {
+            console.log(err);
+        }
+        ipfslink = `https://gateway.ipfs.io/ipfs/${file[0].path}`;
+        res.send(ipfslink);
+    });
+}
 const ipfsUpload = async (req, res) => {
     const ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
 
@@ -104,7 +130,7 @@ const ipfsUploadNew = async (req, res) => {
 
     let start = req.body.start;
     start = parseInt(start);
-    let end = start+200;
+    let end = start + 200;
     let ipfsArray = [];
     let promises = [];
 
@@ -119,7 +145,7 @@ const ipfsUploadNew = async (req, res) => {
     //     })
     // })
     console.log(end);
-    for(let f=start;f<=9;f++){
+    for (let f = start; f <= 9; f++) {
         // console.log(f);
         arrayOfFiles.push({
             path: Math.random(),
@@ -130,19 +156,19 @@ const ipfsUploadNew = async (req, res) => {
 
     console.log(arrayOfFiles);
 
-    let j=1;
+    let j = 1;
     await ipfs.add(arrayOfFiles, async (err2, result) => {
         console.info(result)
-        if(result){
+        if (result) {
             let ipfshash = [];
-            result.forEach((element,index) => {
+            result.forEach((element, index) => {
                 ipfshash[index] = element.hash;
             })
             console.log(ipfshash);
             axios.post('http://127.0.0.1:8001/api/update-ipfs-link', {
-                    hash:ipfshash,
-                    start:start
-                })
+                hash: ipfshash,
+                start: start
+            })
                 .then(res => {
                     console.log(`statusCode: ${res.status}`)
                     console.log(res)
@@ -152,9 +178,9 @@ const ipfsUploadNew = async (req, res) => {
                 })
             res.send(ipfshash);
         }
-    });    
+    });
     res.send("done");
-    return ;
+    return;
 }
 
 const ipfsUploadWithAttr = async (req, res) => {
@@ -164,21 +190,21 @@ const ipfsUploadWithAttr = async (req, res) => {
     let path = req.body.path;
     console.log(path);
     let buffer = "";
-    
+
     let arrayOfFiles = [];
 
     var config = {
         method: 'get',
         url: 'http://127.0.0.1:8001/all-data',
-        headers: { 
-          'Content-Type': 'application/json'
+        headers: {
+            'Content-Type': 'application/json'
         },
-      };
-      let response = await axios(config);
+    };
+    let response = await axios(config);
     //   console.log(response);
-      let start = response.data.start;
-      response = response.data.data;
-      response.forEach(async(element,index) => {
+    let start = response.data.start;
+    response = response.data.data;
+    response.forEach(async (element, index) => {
         testFile1 = JSON.parse(element);
         // testFile1.attributes = JSON.parse(element.attributes);
         let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
@@ -189,52 +215,52 @@ const ipfsUploadWithAttr = async (req, res) => {
             // mtime: fs.statSync(file).mtime
         })
 
-      });
+    });
 
-      await ipfs.add(arrayOfFiles, function (err2, resp) {
-            if (err2) {
-                console.log(err2);
-            }
-            console.log(resp);
-            let ipfshash = [];
-            resp.forEach((element,index) => {
-                ipfshash[index] = element.hash;
+    await ipfs.add(arrayOfFiles, function (err2, resp) {
+        if (err2) {
+            console.log(err2);
+        }
+        console.log(resp);
+        let ipfshash = [];
+        resp.forEach((element, index) => {
+            ipfshash[index] = element.hash;
+        })
+        console.log(ipfshash);
+        axios.post('http://127.0.0.1:8001/api/update-ipfs-metadata', {
+            hash: ipfshash,
+            start: start
+        })
+            .then(res => {
+                console.log(`statusCode: ${res.status}`)
+                console.log(res)
             })
-            console.log(ipfshash);
-            axios.post('http://127.0.0.1:8001/api/update-ipfs-metadata', {
-                    hash:ipfshash,
-                    start:start
-                })
-                .then(res => {
-                    console.log(`statusCode: ${res.status}`)
-                    console.log(res)
-                })
-                .catch(error => {
-                    console.error(error)
-                });
+            .catch(error => {
+                console.error(error)
+            });
 
-        });
+    });
 
-        res.send("done");
-        // upload attr
-        // let attr =  JSON.parse(req.body.attributes);
-        // let testFile1 = {
-        //     name: `${req.body.name}`,
-        //     image: 'https://gateway.ipfs.io/ipfs/'+hash2,
-        //     attributes: attr,
-        //   };
-        // let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
-        
-        // await ipfs.files.add(testBuffer2, function (err2, resp) {
-        //     if (err2) {
-        //         console.log(err2);
-        //     }
+    res.send("done");
+    // upload attr
+    // let attr =  JSON.parse(req.body.attributes);
+    // let testFile1 = {
+    //     name: `${req.body.name}`,
+    //     image: 'https://gateway.ipfs.io/ipfs/'+hash2,
+    //     attributes: attr,
+    //   };
+    // let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
 
-        //     console.log(resp);
-        //     let newpath = resp ? resp[0].path : "";
+    // await ipfs.files.add(testBuffer2, function (err2, resp) {
+    //     if (err2) {
+    //         console.log(err2);
+    //     }
 
-        //     res.send(newpath);
-        // });
+    //     console.log(resp);
+    //     let newpath = resp ? resp[0].path : "";
+
+    //     res.send(newpath);
+    // });
 }
 
 const signTrx = async (req, res) => {
@@ -253,7 +279,7 @@ const signTrx = async (req, res) => {
     //     new web3.providers.HttpProvider(
     //     //   "https://mainnet.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
     //     "https://ropsten.infura.io/v3/8ee6b6fda80f40c3826c75ff9afa3d05"
-    
+
     //     )
     // );
 
@@ -288,5 +314,6 @@ module.exports = {
     ipfsUpload,
     ipfsUploadNew,
     ipfsUploadWithAttr,
-    signTrx
+    signTrx,
+    uploadFileToIpfs
 };

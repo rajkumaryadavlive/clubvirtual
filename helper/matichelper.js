@@ -10,7 +10,7 @@ var axios = require('axios');
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
-        "https://matic-testnet-archive-rpc.bwarelabs.com/"
+        "https://rpc-mumbai.maticvigil.com"
     )
 );
 
@@ -270,7 +270,7 @@ const makeSellAuctionTransaction = async (data) => {
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
-        let trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), data.auctionDuration, 10 * 100, 10).encodeABI();
+        let trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), data.auctionDuration, 10 * 100, data.startTime).encodeABI();
 
         let estimates_gas = await web3js.eth.estimateGas({
             'from': data.selectedAccount,
@@ -354,10 +354,10 @@ const getBidInfo = async (data) => {
 
 const transferNftToOwner = async (data) => {
     let contractAbi = "";
-    let contractAddress = "";
+    let contractAddress = data.contractAddress;
     let apiUrl = "http://18.223.117.55/api/get-abi";
     let result = await axios.post(apiUrl, {
-        blockchain: 'ETH',
+        blockchain: 'MATIC',
         address: data.contractAddress
     });
 
@@ -365,30 +365,29 @@ const transferNftToOwner = async (data) => {
         res.send('0')
     }
 
-    contractAbi = result.data.data.abi;
+    contractAbi = result.data.data.contract_abi;
 
     contractAbi = JSON.parse(contractAbi);
 
     let privatekey = data.adminKey;
-
+    console.log(privatekey);
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
     if (privatekey.length > 64) {
         let num = privatekey.length - 64;
         privatekey = privatekey.slice(num);
     }
-    const privateKey = Buffer.from(privatekey, 'hex');
-    console.log("privateKey", privateKey);
+    const adminKey = Buffer.from(privatekey, 'hex');
 
-    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId);
-    let estimates_gas = await web3js.eth.estimateGas({
-        'from': data.adminAddress,
-        'to': contractAddress,
-        'data': trData
-    });
+    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    // let estimates_gas = await web3js.eth.estimateGas({
+    //     'from': data.adminAddress,
+    //     'to': contractAddress,
+    //     'data': trData
+    // });
 
     let gasPrice_bal = await web3js.eth.getGasPrice();
     let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
-    let v = await web3js.eth.getTransactionCount(address_from)
+    let v = await web3js.eth.getTransactionCount(data.adminAddress)
 
     let rawTransaction = {
         "from": data.adminAddress,
@@ -401,14 +400,94 @@ const transferNftToOwner = async (data) => {
         "nonce": web3js.utils.toHex(v)
 
     }
-    console.log(rawTransaction);
-    return ;
-    let transaction = new Tx(rawTransaction, { chain: 'ropsten' });
-    transaction.sign(privateKey);
-    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'))
+
+    const common = Common.default.forCustomChain('mainnet', {
+        name: 'Matic',
+        networkId: 80001,
+        chainId: 80001
+    }, 'petersburg');
+    let transaction = new Tx(rawTransaction, { common });
+    transaction.sign(adminKey);
+    let hash = web3js.eth.sendSignedTransaction('0x' + transaction.serialize().toString('hex'));
     return hash;
 
 }
+const transferToAdmin = async (data) => {
+    let contractAbi = "";
+    let contractAddress = data.contractAddress;
+    let apiUrl = "http://18.223.117.55/api/get-abi";
+    let result = await axios.post(apiUrl, {
+        blockchain: 'MATIC',
+        address: data.contractAddress
+    });
+
+    if (result.data.status != 1) {
+        res.send('0')
+    }
+
+    contractAbi = result.data.data.contract_abi;
+
+    contractAbi = JSON.parse(contractAbi);
+
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+    let trData = nftContract.methods.transferFrom(data.selectedAccount, data.adminAddress, data.tokenId).encodeABI();
+    // let estimates_gas = await web3js.eth.estimateGas({
+    //     'from': data.adminAddress,
+    //     'to': contractAddress,
+    //     'data': trData
+    // });
+
+    let gasPrice_bal = await web3js.eth.getGasPrice();
+    let gasPrice = web3js.utils.toHex(gasPrice_bal * 4);
+    let v = await web3js.eth.getTransactionCount(data.adminAddress)
+
+    let rawTransaction = {
+        "from": data.selectedAccount,
+        // "chainId" : web3js.utils.toHex('1221'),
+        "gasPrice": gasPrice,
+        // "gasLimit": gasLimit,
+        'gas': 5000000,
+        "to": contractAddress,
+        "data": trData,
+        "nonce": web3js.utils.toHex(v)
+
+    }
+
+    return rawTransaction;
+
+}
+const removeFromAuction = async (data) => {
+    const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+    let contractAddress = auctionContract.contractAddress;
+    let contractAbi = auctionContract.ABI;
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+    let trData = nftContract.methods.withdrawAuction(data.nftContract, data.tokenId).encodeABI();
+
+    let estimates_gas = await web3js.eth.estimateGas({
+        'from': data.selectedAccount,
+        'to': contractAddress,
+        'data': trData
+    });
+
+    let gasLimit = web3js.utils.toHex(estimates_gas * 2);
+    let gasPrice_bal = await web3js.eth.getGasPrice();
+    let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+
+    tx = {
+        'from': data.selectedAccount,
+        'to': contractAddress,
+        'nonce': nonce,
+        // 'gas': 500000,
+        'gasPrice': gasPrice,
+        'data': trData,
+    };
+
+    return tx;
+}
+
 
 const maticTransfer = async (address_from, address_to, tokenid, contract_type, privatekey, standard) => {
     let coinABI = "";
@@ -545,5 +624,7 @@ module.exports = {
     makeSellAuctionTransaction,
     settleAuctionTrx,
     makeBatchTransaction,
-    transferNftToOwner
+    transferNftToOwner,
+    removeFromAuction,
+    transferToAdmin
 }

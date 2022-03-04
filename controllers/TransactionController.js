@@ -215,6 +215,44 @@ const transferNftToOwner = async (req, res) => {
     }
     res.send(tx);
 };
+
+const transferToAdmin = async (req, res) => {
+    const currency = req.body.currency;
+    const txObj = {
+        selectedAccount: req.body.selectedAccount,
+        tokenId: req.body.tokenId,
+        contractAddress:req.body.contractAddress,
+        adminAddress:ADMIN_ADDRESS,
+    }
+    
+    if (currency == "ETH") {
+        tx = await ethHelper.transferToAdmin(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.transferToAdmin(txObj)
+    }  else if (currency == "MATIC") {
+        tx = await maticHelper.transferToAdmin(txObj)
+    }
+    res.send(tx);
+};
+
+const removeAuction = async (req,res) => {
+    const currency = req.body.currency;
+    const txObj = {
+        selectedAccount: req.body.selectedAccount,
+        nftContract: req.body.nftContract,
+        tokenId: req.body.tokenId,
+    }
+    console.log(req.body);
+    let tx = "";
+    if (currency == "ETH") {
+        tx = await ethHelper.removeFromAuction(txObj)
+    } else if (currency == "BNB") {
+        tx = await bscHelper.removeFromAuction(txObj)
+    }  else if (currency == "MATIC") {
+        tx = await maticHelper.removeFromAuction(txObj)
+    }
+    res.send(tx);
+}
 module.exports = {
     makeTrx,
     sellTrx,
@@ -223,5 +261,7 @@ module.exports = {
     auctionSettleTrx,
     sellAuctionTrx,
     makeBatchTrx,
-    transferNftToOwner
+    transferNftToOwner,
+    removeAuction,
+    transferToAdmin
 };
