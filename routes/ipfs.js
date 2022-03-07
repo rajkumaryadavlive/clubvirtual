@@ -34,7 +34,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/", upload.single("myFile"), (req, res) => {
+router.post("/add", upload.single("myFile"), (req, res) => {
   try {
     
     console.log(req.body);
