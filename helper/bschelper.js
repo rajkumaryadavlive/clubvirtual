@@ -367,21 +367,27 @@ const transferNftToOwner = async (data) => {
     if (result.data.status != 1) {
         res.send('0')
     }
-
+    let nft_standard = result.data.data.standard;
+    
     contractAbi = result.data.data.contract_abi;
 
     contractAbi = JSON.parse(contractAbi);
 
     let privatekey = data.adminKey;
-    console.log(privatekey);
+    
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
     if (privatekey.length > 64) {
         let num = privatekey.length - 64;
         privatekey = privatekey.slice(num);
     }
     const adminKey = Buffer.from(privatekey, 'hex');
-
-    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    let trData = "";
+    if(nft_standard == "1155"){
+        let readContract = nftContract.balanceOf();
+        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    } else{
+        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    }
     // let estimates_gas = await web3js.eth.estimateGas({
     //     'from': data.adminAddress,
     //     'to': contractAddress,

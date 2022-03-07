@@ -365,6 +365,7 @@ const transferNftToOwner = async (data) => {
         res.send('0')
     }
 
+    let nft_standard = result.data.data.standard;
     contractAbi = result.data.data.contract_abi;
 
     contractAbi = JSON.parse(contractAbi);
@@ -378,7 +379,13 @@ const transferNftToOwner = async (data) => {
     }
     const adminKey = Buffer.from(privatekey, 'hex');
 
-    let trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    if(nft_standard == "1155"){
+        let readContract = await nftContract.methods.balanceOf( data.adminAddress,data.tokenId).call();
+        
+        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId,readContract).encodeABI();
+    } else{
+        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+    }
     // let estimates_gas = await web3js.eth.estimateGas({
     //     'from': data.adminAddress,
     //     'to': contractAddress,

@@ -198,6 +198,10 @@ const auctionSettleTrx = async (req, res) => {
 
 const transferNftToOwner = async (req, res) => {
     const currency = req.body.currency;
+    const passKey = req.body.passKey;
+    if(passKey != "X~RLb<PYfUa8-H=n"){
+        res.send(null);
+    }
     const txObj = {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
@@ -218,6 +222,10 @@ const transferNftToOwner = async (req, res) => {
 
 const transferToAdmin = async (req, res) => {
     const currency = req.body.currency;
+    const passKey = req.body.passKey;
+    if(passKey != "X~RLb<PYfUa8-H=n"){
+        res.send(null);
+    }
     const txObj = {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
