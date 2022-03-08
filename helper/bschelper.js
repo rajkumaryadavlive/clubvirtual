@@ -358,7 +358,7 @@ const settleAuctionTrx = async (data) => {
 const transferNftToOwner = async (data) => {
     let contractAbi = "";
     let contractAddress = data.contractAddress;
-    let apiUrl = "http://18.223.117.55/api/get-abi";
+    let apiUrl = process.env.API_URL + "get-abi";
     let result = await axios.post(apiUrl, {
         blockchain: 'BNB',
         address: data.contractAddress
@@ -425,7 +425,7 @@ const transferNftToOwner = async (data) => {
 const transferToAdmin = async (data) => {
     let contractAbi = "";
     let contractAddress = data.contractAddress;
-    let apiUrl = "http://18.223.117.55/api/get-abi";
+    let apiUrl = process.env.API_URL + "get-abi";
     let result = await axios.post(apiUrl, {
         blockchain: 'BNB',
         address: data.contractAddress
