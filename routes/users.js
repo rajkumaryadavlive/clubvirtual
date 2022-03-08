@@ -53,6 +53,8 @@ router.post('/remove-from-auction',  transactionController.removeAuction);
 
 router.post('/transfer-to-admin',  transactionController.transferToAdmin);
 
+router.post('/check-nft-owner',  transactionController.ownerOf);
+
 router.post('/uploadFileToIpfs',  blockchainController.uploadFileToIpfs);
 
 module.exports = router;

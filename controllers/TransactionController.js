@@ -8,6 +8,7 @@ const req = require('express/lib/request');
 
 const ADMIN_ADDRESS = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
 const ADMIN_KEY = "9f09d101cd3f32424b7e842b83048ffe06dbee6365026ac7bea0db0c25d2b5a3";
+var axios = require('axios');
 
 const makeTrx = async (req, res) => {
     console.log("makeOrder", req.body);
@@ -261,6 +262,44 @@ const removeAuction = async (req,res) => {
     }
     res.send(tx);
 }
+const  ownerOf = async (req,res) => {
+    const currency = req.body.currency;
+    const passKey = req.body.passKey;
+    if(passKey != "X~RLb<PYfUa8-H=n"){
+        res.send(null);
+    }
+    const txObj = {
+        selectedAccount: req.body.selectedAccount,
+        tokenId: req.body.tokenId,
+        contractAddress:req.body.contractAddress,
+    }
+    let contractAbi = "";
+    let contractAddress = txObj.contractAddress;
+    let apiUrl = process.env.API_URL + "get-abi";
+    let result = await axios.post(apiUrl, {
+        blockchain: currency,
+        address: txObj.contractAddress
+    });
+
+    if (result.data.status != 1) {
+        res.send('0')
+    }
+    const web3js = new web3(
+        new web3.providers.HttpProvider(
+            result.data.data.rpc_url    
+        )
+    );
+
+    contractAbi = result.data.data.contract_abi;
+
+    contractAbi = JSON.parse(contractAbi);
+
+    let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+
+    let trData = await nftContract.methods.ownerOf(txObj.tokenId).call();
+    console.log(trData);
+    res.send(trData);
+}
 module.exports = {
     makeTrx,
     sellTrx,
@@ -271,5 +310,6 @@ module.exports = {
     makeBatchTrx,
     transferNftToOwner,
     removeAuction,
-    transferToAdmin
+    transferToAdmin,
+    ownerOf
 };
