@@ -578,6 +578,7 @@ const ETHTransfer = async (address_from, address_to, tokenid, contract_type, pri
     }
     catch (error) {
         console.log("error", error)
+        return null;
     }
 }
 
