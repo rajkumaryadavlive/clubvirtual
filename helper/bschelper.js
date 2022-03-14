@@ -383,8 +383,9 @@ const transferNftToOwner = async (data) => {
     const adminKey = Buffer.from(privatekey, 'hex');
     let trData = "";
     if(nft_standard == "1155"){
-        let readContract = nftContract.balanceOf();
-        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
+        let readContract = await nftContract.methods.balanceOf( data.adminAddress,data.tokenId).call();
+        
+        trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId,readContract).encodeABI();
     } else{
         trData = nftContract.methods.transferFrom(data.adminAddress, data.selectedAccount, data.tokenId).encodeABI();
     }

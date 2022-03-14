@@ -232,6 +232,7 @@ const transferToAdmin = async (req, res) => {
         tokenId: req.body.tokenId,
         contractAddress:req.body.contractAddress,
         adminAddress:ADMIN_ADDRESS,
+        standard:req.body.standard,
     }
     
     if (currency == "ETH") {
@@ -272,7 +273,9 @@ const  ownerOf = async (req,res) => {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
         contractAddress:req.body.contractAddress,
+        standard:req.body.standard
     }
+    console.log(txObj);
     let contractAbi = "";
     let contractAddress = txObj.contractAddress;
     let apiUrl = process.env.API_URL + "get-abi";
@@ -295,8 +298,12 @@ const  ownerOf = async (req,res) => {
     contractAbi = JSON.parse(contractAbi);
 
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
-
-    let trData = await nftContract.methods.ownerOf(txObj.tokenId).call();
+    let trData = null;
+    if(txObj.standard == "1155"){
+        trData = await nftContract.methods.balanceOf(txObj.selectedAccount,txObj.tokenId).call();
+    } else{
+        trData = await nftContract.methods.ownerOf(txObj.tokenId).call();
+    }
     console.log(trData);
     res.send(trData);
 }

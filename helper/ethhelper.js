@@ -450,8 +450,14 @@ const transferToAdmin = async (data) => {
     contractAbi = JSON.parse(contractAbi);
 
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
-
-    let trData = nftContract.methods.transferFrom(data.selectedAccount, data.adminAddress, data.tokenId).encodeABI();
+    let trData = null;
+    if(data.standard == "1155"){
+        let readContract = await nftContract.methods.balanceOf( data.selectedAccount,data.tokenId).call();
+        
+        trData = nftContract.methods.transferFrom(data.selectedAccount, data.adminAddress, data.tokenId,readContract).encodeABI();
+    } else{
+        trData = nftContract.methods.transferFrom(data.selectedAccount, data.adminAddress, data.tokenId).encodeABI();
+    }
     // let estimates_gas = await web3js.eth.estimateGas({
     //     'from': data.adminAddress,
     //     'to': contractAddress,
