@@ -7,8 +7,8 @@ const web3 = require('web3');
 let fs = require("fs");
 var axios = require('axios');
 
-const ADMIN_ADDRESS = "0xAE0F55181eb2F538418024B1b04743eD33fb3F1E";
-const ADMIN_KEY = "9f09d101cd3f32424b7e842b83048ffe06dbee6365026ac7bea0db0c25d2b5a3";
+const ADMIN_ADDRESS = process.env.ADMIN_ADDRESS;
+const ADMIN_KEY = process.env.ADMIN_KEY;
 
 const transferNFT = async (req, res) => {
     console.log("Post Method transferNFT");
