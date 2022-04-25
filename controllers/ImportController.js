@@ -8,7 +8,7 @@ const bscAuction = require('../contract/bsc-auction')
 // let bscRpc = "https://data-seed-prebsc-1-s1.binance.org:8545/";
 // let maticRpc = "https://rpc-mumbai.maticvigil.com";
 
-let ethRpc = "https://mainnet.infura.io/v3/";
+let ethRpc = "https://mainnet.infura.io/v3/a07044e72bae444c8a07f2f454904ab5";
 let bscRpc = "https://bsc-dataseed.binance.org/";
 let maticRpc = "https://polygon-rpc.com/";
 
