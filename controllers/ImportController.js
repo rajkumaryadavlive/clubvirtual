@@ -4,9 +4,13 @@ const maticAuction = require('../contract/matic-auction')
 const ethAuction = require('../contract/eth-auction')
 const bscAuction = require('../contract/bsc-auction')
 
-let ethRpc = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
-let bscRpc = "https://data-seed-prebsc-1-s1.binance.org:8545/";
-let maticRpc = "https://rpc-mumbai.maticvigil.com";
+// let ethRpc = "https://ropsten.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161";
+// let bscRpc = "https://data-seed-prebsc-1-s1.binance.org:8545/";
+// let maticRpc = "https://rpc-mumbai.maticvigil.com";
+
+let ethRpc = "https://mainnet.infura.io/v3/";
+let bscRpc = "https://bsc-dataseed.binance.org/";
+let maticRpc = "https://polygon-rpc.com/";
 
 const getCollection = async (req, res) => {
     console.log("makeOrder", req.body);

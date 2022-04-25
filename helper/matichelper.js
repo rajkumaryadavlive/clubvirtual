@@ -10,7 +10,8 @@ var axios = require('axios');
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
-        "https://rpc-mumbai.maticvigil.com"
+        // "https://rpc-mumbai.maticvigil.com"
+        "https://polygon-rpc.com/"
     )
 );
 
