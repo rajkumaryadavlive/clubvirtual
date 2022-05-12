@@ -20,6 +20,7 @@ const makeTrx = async (req, res) => {
     let tx = "";
 
     const txObj = {
+        currency : currency,
         amount: req.body.amount,
         selectedAccount: req.body.selectedAccount,
         contract_type: req.body.contract_type,
@@ -31,6 +32,8 @@ const makeTrx = async (req, res) => {
         nft_owner: req.body.nft_owner,
         royalty: req.body.royalty,
         standard: req.body.standard,
+        nft_contract_address:req.body.nft_contract_address,
+        token_id:req.body.token_id
 
     }
 
