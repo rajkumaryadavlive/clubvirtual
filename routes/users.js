@@ -47,7 +47,8 @@ router.post('/get-collection-trx',  importController.getCollectionTrx);
 
 router.post('/get-single-collection-trx',  importController.getSingleCollectionTrx);
 
-router.post('/remove-from-sale',  transactionController.transferNftToOwner);
+router.post('/remove-from-sale',  transactionController.removeFromSale);
+// router.post('/remove-from-sale',  transactionController.transferNftToOwner);
 
 router.post('/remove-from-auction',  transactionController.removeAuction);
 

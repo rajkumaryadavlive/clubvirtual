@@ -20,7 +20,7 @@ const makeTrx = async (req, res) => {
     let tx = "";
 
     const txObj = {
-        currency : currency,
+        currency: currency,
         amount: req.body.amount,
         selectedAccount: req.body.selectedAccount,
         contract_type: req.body.contract_type,
@@ -32,8 +32,9 @@ const makeTrx = async (req, res) => {
         nft_owner: req.body.nft_owner,
         royalty: req.body.royalty,
         standard: req.body.standard,
-        nft_contract_address:req.body.nft_contract_address,
-        token_id:req.body.token_id
+        nft_contract_address: req.body.nft_contract_address,
+        token_id: req.body.token_id,
+        is_offer: req.body.is_offer
 
     }
 
@@ -94,11 +95,15 @@ const sellTrx = async (req, res) => {
     const currency = req.body.currency;
 
     const txObj = {
+        currency: currency,
         selectedAccount: req.body.selectedAccount,
         contract_type: req.body.contract_type,
         transferTo: req.body.transferTo,
         tokenId: req.body.tokenId,
         standard: req.body.standard,
+        contractAddress: req.body.contractAddress,
+        amount: req.body.amount,
+        royalty: req.body.royalty,
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
@@ -124,9 +129,9 @@ const sellAuctionTrx = async (req, res) => {
         amount: req.body.amount,
         auctionDuration: req.body.auctionDuration,
         tokenId: req.body.tokenId,
-        royalty:req.body.royalty,
-        comission:req.body.comission,
-        startTime:req.body.startTime
+        royalty: req.body.royalty,
+        comission: req.body.comission,
+        startTime: req.body.startTime
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
@@ -195,7 +200,7 @@ const auctionSettleTrx = async (req, res) => {
         tx = await ethHelper.settleAuctionTrx(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.settleAuctionTrx(txObj)
-    }  else if (currency == "MATIC") {
+    } else if (currency == "MATIC") {
         tx = await maticHelper.settleAuctionTrx(txObj)
     }
     res.send(tx);
@@ -204,52 +209,71 @@ const auctionSettleTrx = async (req, res) => {
 const transferNftToOwner = async (req, res) => {
     const currency = req.body.currency;
     const passKey = req.body.passKey;
-    if(passKey != "X~RLb<PYfUa8-H=n"){
+    if (passKey != "X~RLb<PYfUa8-H=n") {
         res.send(null);
     }
     const txObj = {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
-        contractAddress:req.body.contractAddress,
-        adminAddress:ADMIN_ADDRESS,
-        adminKey:ADMIN_KEY
+        contractAddress: req.body.contractAddress,
+        adminAddress: ADMIN_ADDRESS,
+        adminKey: ADMIN_KEY
     }
     console.log(txObj);
     if (currency == "ETH") {
         tx = await ethHelper.transferNftToOwner(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.transferNftToOwner(txObj)
-    }  else if (currency == "MATIC") {
+    } else if (currency == "MATIC") {
         tx = await maticHelper.transferNftToOwner(txObj)
     }
     res.send(tx);
 };
 
+const removeFromSale = async (req, res) => {
+    const currency = req.body.currency;
+    const passKey = req.body.passKey;
+    if (passKey != "X~RLb<PYfUa8-H=n") {
+        res.send(null);
+    }
+    const txObj = {
+        currency:currency,
+        selectedAccount: req.body.selectedAccount,
+        tokenId: req.body.tokenId,
+        contractAddress: req.body.contractAddress,
+    }
+    console.log(txObj);
+
+    tx = await bscHelper.removeSale(txObj)
+    console.log(tx);
+    res.send(tx);
+}
+
 const transferToAdmin = async (req, res) => {
     const currency = req.body.currency;
     const passKey = req.body.passKey;
-    if(passKey != "X~RLb<PYfUa8-H=n"){
+    if (passKey != "X~RLb<PYfUa8-H=n") {
         res.send(null);
     }
     const txObj = {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
-        contractAddress:req.body.contractAddress,
-        adminAddress:ADMIN_ADDRESS,
-        standard:req.body.standard,
+        contractAddress: req.body.contractAddress,
+        adminAddress: ADMIN_ADDRESS,
+        standard: req.body.standard,
     }
-    
+
     if (currency == "ETH") {
         tx = await ethHelper.transferToAdmin(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.transferToAdmin(txObj)
-    }  else if (currency == "MATIC") {
+    } else if (currency == "MATIC") {
         tx = await maticHelper.transferToAdmin(txObj)
     }
     res.send(tx);
 };
 
-const removeAuction = async (req,res) => {
+const removeAuction = async (req, res) => {
     const currency = req.body.currency;
     const txObj = {
         selectedAccount: req.body.selectedAccount,
@@ -262,22 +286,22 @@ const removeAuction = async (req,res) => {
         tx = await ethHelper.removeFromAuction(txObj)
     } else if (currency == "BNB") {
         tx = await bscHelper.removeFromAuction(txObj)
-    }  else if (currency == "MATIC") {
+    } else if (currency == "MATIC") {
         tx = await maticHelper.removeFromAuction(txObj)
     }
     res.send(tx);
 }
-const  ownerOf = async (req,res) => {
+const ownerOf = async (req, res) => {
     const currency = req.body.currency;
     const passKey = req.body.passKey;
-    if(passKey != "X~RLb<PYfUa8-H=n"){
+    if (passKey != "X~RLb<PYfUa8-H=n") {
         res.send(null);
     }
     const txObj = {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
-        contractAddress:req.body.contractAddress,
-        standard:req.body.standard
+        contractAddress: req.body.contractAddress,
+        standard: req.body.standard
     }
     console.log(txObj);
     let contractAbi = "";
@@ -293,7 +317,7 @@ const  ownerOf = async (req,res) => {
     }
     const web3js = new web3(
         new web3.providers.HttpProvider(
-            result.data.data.rpc_url    
+            result.data.data.rpc_url
         )
     );
 
@@ -303,9 +327,9 @@ const  ownerOf = async (req,res) => {
 
     let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
     let trData = null;
-    if(txObj.standard == "1155"){
-        trData = await nftContract.methods.balanceOf(txObj.selectedAccount,txObj.tokenId).call();
-    } else{
+    if (txObj.standard == "1155") {
+        trData = await nftContract.methods.balanceOf(txObj.selectedAccount, txObj.tokenId).call();
+    } else {
         trData = await nftContract.methods.ownerOf(txObj.tokenId).call();
     }
     console.log(trData);
@@ -322,5 +346,6 @@ module.exports = {
     transferNftToOwner,
     removeAuction,
     transferToAdmin,
-    ownerOf
+    ownerOf,
+    removeFromSale
 };
