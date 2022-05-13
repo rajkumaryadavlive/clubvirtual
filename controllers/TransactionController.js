@@ -150,6 +150,7 @@ const bidTrx = async (req, res) => {
     const currency = req.body.currency;
 
     const txObj = {
+        currency:currency,
         selectedAccount: req.body.selectedAccount,
         contractAddress: req.body.contractAddress,
         erc20: req.body.erc20,
@@ -172,6 +173,7 @@ const bidInfo = async (req, res) => {
     const currency = req.body.currency;
 
     const txObj = {
+        currency:currency,
         contractAddress: req.body.contractAddress,
         tokenId: req.body.tokenId,
     }

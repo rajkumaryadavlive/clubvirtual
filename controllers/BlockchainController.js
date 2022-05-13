@@ -6,6 +6,8 @@ const web3 = require('web3');
 // const { ethers } = require("ethers");
 let fs = require("fs");
 var axios = require('axios');
+var abi = require('ethereumjs-abi')
+
 
 const ADMIN_ADDRESS = process.env.ADMIN_ADDRESS;
 const ADMIN_KEY = process.env.ADMIN_KEY;
@@ -308,6 +310,14 @@ const signTrx = async (req, res) => {
     //     res.send(result);
     // })
 }
+
+const signMsg = async(req,res) => {
+    var hash = "0x" + abi.soliditySHA3(
+        ["address", "uint256", "uint256", "address"],
+        ['0xAE0F55181eb2F538418024B1b04743eD33fb3F1E', '0.01', '237', '0x524CbF476eb918d5Ffa47E8A24732B370F640FE9']
+    ).toString("hex");
+res.send(hash);
+}
 module.exports = {
     transferNFT,
     admintransfer,
@@ -315,5 +325,6 @@ module.exports = {
     ipfsUploadNew,
     ipfsUploadWithAttr,
     signTrx,
-    uploadFileToIpfs
+    uploadFileToIpfs,
+    signMsg
 };

@@ -360,28 +360,49 @@ const makeSellAuctionTransaction = async (data) => {
 const makeBidTransaction = async (data) => {
     try {
         console.log(data);
-        const nonce = await web3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+        let apiUrl = process.env.API_URL + "get-abi";
 
-        let contractAddress = auctionContract.contractAddress;
-        let contractAbi = auctionContract.ABI;
+        let rpcurl = "";
+        let contractAddress = "";
+        let contractAbi = "";
 
-        let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
+        let result = await axios.post(apiUrl, {
+            blockchain: data.currency,
+            type: 'auction'
+        });
+        if (result.data.status != 1) {
+            res.send('0')
+        }
+
+        contractAbi = result.data.data.abi;
+
+        contractAbi = JSON.parse(contractAbi);
+        contractAddress = result.data.data.address;
+        rpcurl = result.data.rpc_url;
+
+        let web3Obj = new web3(
+            new web3.providers.HttpProvider(rpcurl)
+        );
+
+        const nonce = await web3Obj.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let nftContract = new web3Obj.eth.Contract(contractAbi, contractAddress);
 
         let amt = data.amount * 1000000000000000000;
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
         let trData = nftContract.methods.makeBid(data.contractAddress, data.tokenId, data.erc20, "0").encodeABI();
 
-        let estimates_gas = await web3js.eth.estimateGas({
+        let estimates_gas = await web3Obj.eth.estimateGas({
             'from': data.selectedAccount,
             'to': contractAddress,
             'value': amt,
             'data': trData
         });
 
-        let gasLimit = web3js.utils.toHex(estimates_gas * 2);
-        let gasPrice_bal = await web3js.eth.getGasPrice();
-        let gasPrice = web3js.utils.toHex(gasPrice_bal * 2);
+        let gasLimit = web3Obj.utils.toHex(estimates_gas * 2);
+        let gasPrice_bal = await web3Obj.eth.getGasPrice();
+        let gasPrice = web3Obj.utils.toHex(gasPrice_bal * 2);
 
         tx = {
             'from': data.selectedAccount,
@@ -401,14 +422,39 @@ const makeBidTransaction = async (data) => {
 }
 
 const getBidInfo = async (data) => {
-    console.log(data);
+    
     try {
-        let Contract = new web3js.eth.Contract(auctionContract.ABI, auctionContract.contractAddress);
+        console.log(data);
+        let apiUrl = process.env.API_URL + "get-abi";
+
+        let rpcurl = "";
+        let contractAddress = "";
+        let contractAbi = "";
+
+        let result = await axios.post(apiUrl, {
+            blockchain: data.currency,
+            type: 'auction'
+        });
+        if (result.data.status != 1) {
+            res.send('0')
+        }
+
+        contractAbi = result.data.data.abi;
+
+        contractAbi = JSON.parse(contractAbi);
+        contractAddress = result.data.data.address;
+        rpcurl = result.data.rpc_url;
+
+        let web3Obj = new web3(
+            new web3.providers.HttpProvider(rpcurl)
+        );
+
+        let Contract = new web3Obj.eth.Contract(contractAbi, contractAddress);
 
         let res = Contract.methods.nftContractAuctions(data.contractAddress, data.tokenId).call();
         return res;
     } catch (error) {
-        console.log("errror", error);
+        console.log("error", error);
         return null;
     }
 }

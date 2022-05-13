@@ -58,4 +58,6 @@ router.post('/check-nft-owner',  transactionController.ownerOf);
 
 router.post('/uploadFileToIpfs',  blockchainController.uploadFileToIpfs);
 
+router.post('/sign-message',  blockchainController.signMsg);
+
 module.exports = router;
