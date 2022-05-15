@@ -51,6 +51,22 @@ const makeTrx = async (req, res) => {
     res.send(tx)
 }
 
+const proposalTrx = async (req,res) => {
+    const currency = req.body.currency;
+
+    const txObj = {
+        currency: currency,
+        selectedAccount: req.body.selectedAccount,
+        tokenId: req.body.tokenId,
+        contractAddress: req.body.contractAddress,
+        amount: req.body.amount,
+        buyerAccount:req.body.buyerAccount
+    }
+    let tx = null;
+    tx = await bscHelper.makeProposal(txObj);
+    res.send(tx);
+}
+
 const makeBatchTrx = async (req, res) => {
     console.log("makeOrder", req.body);
     const amount = req.body.amount;
@@ -104,6 +120,8 @@ const sellTrx = async (req, res) => {
         contractAddress: req.body.contractAddress,
         amount: req.body.amount,
         royalty: req.body.royalty,
+        comission:req.body.comission,
+        platformFee:req.body.platformFee
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
@@ -123,6 +141,7 @@ const sellAuctionTrx = async (req, res) => {
     const currency = req.body.currency;
 
     const txObj = {
+        currency:currency,
         selectedAccount: req.body.selectedAccount,
         contractAddress: req.body.contractAddress,
         erc20: req.body.erc20,
@@ -131,6 +150,7 @@ const sellAuctionTrx = async (req, res) => {
         tokenId: req.body.tokenId,
         royalty: req.body.royalty,
         comission: req.body.comission,
+        platformFee: req.body.platformFee,
         startTime: req.body.startTime
     }
     let tx = null;
@@ -349,5 +369,6 @@ module.exports = {
     removeAuction,
     transferToAdmin,
     ownerOf,
-    removeFromSale
+    removeFromSale,
+    proposalTrx
 };

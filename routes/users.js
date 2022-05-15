@@ -17,6 +17,8 @@ router.post('/Admin-transfer',  blockchainController.admintransfer);
 
 router.post('/make-trx',  transactionController.makeTrx);
 
+router.post('/get-proposal-trx',  transactionController.proposalTrx);
+
 router.post('/make-batch-trx',  transactionController.makeBatchTrx);
 
 router.post('/make-sell-trx',  transactionController.sellTrx);
