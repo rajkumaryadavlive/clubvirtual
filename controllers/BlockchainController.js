@@ -6,7 +6,7 @@ const web3 = require('web3');
 // const { ethers } = require("ethers");
 let fs = require("fs");
 var axios = require('axios');
-var abi = require('ethereumjs-abi')
+// var abi = require('ethereumjs-abi')
 
 
 const ADMIN_ADDRESS = process.env.ADMIN_ADDRESS;
