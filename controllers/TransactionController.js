@@ -248,11 +248,11 @@ const removeFromSale = async (req, res) => {
         selectedAccount: req.body.selectedAccount,
         tokenId: req.body.tokenId,
         contractAddress: req.body.contractAddress,
+        standard: req.body.standard,
     }
-    console.log(txObj);
 
     tx = await bscHelper.removeSale(txObj)
-    console.log(tx);
+    // console.log(tx);
     res.send(tx);
 }
 

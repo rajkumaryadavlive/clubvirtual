@@ -49,6 +49,7 @@ const makeTransaction = async (data) => {
                 res.send('0')
             }
 
+            // console.log(result.data);
             contractAbi = result.data.data.abi;
 
             contractAbi = JSON.parse(contractAbi);
@@ -354,8 +355,12 @@ const removeSale = async (data) => {
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-
-        trData = nftContract.methods.withdrawSale(data.contractAddress, data.tokenId).encodeABI();
+        
+        if(data.standard == "1155"){
+            trData = nftContract.methods.withdrawERC1155Sale(data.tokenId).encodeABI();
+        } else{
+            trData = nftContract.methods.withdrawSale(data.contractAddress, data.tokenId).encodeABI();
+        }
 
         let estimates_gas = await newweb3js.eth.estimateGas({
             'from': data.selectedAccount,
