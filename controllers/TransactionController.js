@@ -38,15 +38,7 @@ const makeTrx = async (req, res) => {
 
     }
 
-    if (currency == "ETH") {
-        tx = await ethHelper.makeTransaction(txObj)
-
-    } else if (currency == "BNB") {
-        tx = await bscHelper.makeTransaction(txObj)
-    }
-    else if (currency == "MATIC") {
-        tx = await maticHelper.makeTransaction(txObj)
-    }
+    tx = await bscHelper.makeTransaction(txObj);
 
     res.send(tx)
 }
@@ -106,7 +98,7 @@ const makeBatchTrx = async (req, res) => {
 }
 
 const sellTrx = async (req, res) => {
-    console.log("makeOrder", req.body);
+    // console.log("makeOrder", req.body);
 
     const currency = req.body.currency;
 
@@ -121,17 +113,14 @@ const sellTrx = async (req, res) => {
         amount: req.body.amount,
         royalty: req.body.royalty,
         comission:req.body.comission,
-        platformFee:req.body.platformFee
+        platformFee:req.body.platformFee,
+        type:req.body.type,
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
-    if (currency == "ETH") {
-        tx = await ethHelper.makeSellTransaction(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.makeSellTransaction(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.makeSellTransaction(txObj)
-    }
+    
+    tx = await bscHelper.makeSellTransaction(txObj)
+
     res.send(tx)
 }
 
@@ -151,17 +140,13 @@ const sellAuctionTrx = async (req, res) => {
         royalty: req.body.royalty,
         comission: req.body.comission,
         platformFee: req.body.platformFee,
-        startTime: req.body.startTime
+        startTime: req.body.startTime,
+        type:req.body.type
     }
     let tx = null;
     //  console.log("makeOrder", req.body);
-    if (currency == "ETH") {
-        tx = await ethHelper.makeSellAuctionTransaction(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.makeSellAuctionTransaction(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.makeSellAuctionTransaction(txObj)
-    }
+    tx = await bscHelper.makeSellAuctionTransaction(txObj);
+
     res.send(tx)
 }
 
@@ -298,19 +283,15 @@ const transferToAdmin = async (req, res) => {
 const removeAuction = async (req, res) => {
     const currency = req.body.currency;
     const txObj = {
+        currency:currency,
         selectedAccount: req.body.selectedAccount,
         nftContract: req.body.nftContract,
         tokenId: req.body.tokenId,
     }
-    console.log(req.body);
+
     let tx = "";
-    if (currency == "ETH") {
-        tx = await ethHelper.removeFromAuction(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.removeFromAuction(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.removeFromAuction(txObj)
-    }
+    tx = await bscHelper.removeFromAuction(txObj);
+
     res.send(tx);
 }
 const ownerOf = async (req, res) => {
