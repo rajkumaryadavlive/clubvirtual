@@ -69,9 +69,9 @@ const makeTransaction = async (data) => {
         let trData = "";
         
         // let amt = data.amount * 1000000000000000000;
-        amt = newweb3js.utils.toWei(data.amount, "ether")
+        let amt = newweb3js.utils.toWei(data.amount, "ether");
         // amt = amt.toFixed(0); 
-        console.log(amt);
+        // console.log(amt);
         amt = BigInt(amt).toString();
 
         let adminFee = data.adminFee * 100;
@@ -166,8 +166,9 @@ const makeProposal = async (data) => {
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-        let amt = data.amount * 1000000000000000000;
-        amt = amt.toFixed(0);
+        // let amt = data.amount * 1000000000000000000;
+        let amt = newweb3js.utils.toWei(data.amount, "ether");
+        // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
         
         trData = nftContract.methods.acceptBuyProposal(data.contractAddress, data.tokenId, amt, data.buyerAccount).encodeABI();
@@ -206,8 +207,9 @@ const makeBatchTransaction = async (data) => {
         let nftContract = new web3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-        let amt = data.amount * 1000000000000000000;
-        amt = amt.toFixed(0);
+        // let amt = data.amount * 1000000000000000000;
+        let amt = web3js.utils.toWei(data.amount, "ether");
+        // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
         let adminFee = data.adminFee * 100;
@@ -276,8 +278,9 @@ const makeSellTransaction = async (data) => {
             new web3.providers.HttpProvider(rpcurl)
         );
 
-        let amt = data.amount * 1000000000000000000;
-        amt = amt.toFixed(0);
+        // let amt = data.amount * 1000000000000000000;
+        let amt = newweb3js.utils.toWei(data.amount, "ether");
+        // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
         console.log(amt);
@@ -423,7 +426,8 @@ const makeSellAuctionTransaction = async (data) => {
 
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
-        let amt = data.amount * 1000000000000000000;
+        // let amt = data.amount * 1000000000000000000;
+        let amt = newweb3js.utils.toWei(data.amount, "ether");
         amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
@@ -496,8 +500,9 @@ const makeBidTransaction = async (data) => {
 
         let nftContract = new web3Obj.eth.Contract(contractAbi, contractAddress);
 
-        let amt = data.amount * 1000000000000000000;
-        amt = amt.toFixed(0);
+        // let amt = data.amount * 1000000000000000000;
+        let amt = web3Obj.utils.toWei(data.amount, "ether");
+        // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
         let trData = nftContract.methods.makeBid(data.contractAddress, data.tokenId, data.erc20, "0").encodeABI();
 
