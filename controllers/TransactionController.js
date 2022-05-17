@@ -34,6 +34,7 @@ const makeTrx = async (req, res) => {
         standard: req.body.standard,
         nft_contract_address: req.body.nft_contract_address,
         token_id: req.body.token_id,
+        platform_fee: req.body.platform_fee,
         is_offer: req.body.is_offer
 
     }
