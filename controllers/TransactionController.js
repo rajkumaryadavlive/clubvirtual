@@ -198,18 +198,13 @@ const auctionSettleTrx = async (req, res) => {
     const currency = req.body.currency;
 
     const txObj = {
+        currency:currency,
         selectedAccount: req.body.selectedAccount,
         contractAddress: req.body.contractAddress,
         tokenId: req.body.tokenId,
     }
     //  console.log("makeOrder", req.body);
-    if (currency == "ETH") {
-        tx = await ethHelper.settleAuctionTrx(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.settleAuctionTrx(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.settleAuctionTrx(txObj)
-    }
+    tx = await bscHelper.settleAuctionTrx(txObj);
     res.send(tx);
 }
 

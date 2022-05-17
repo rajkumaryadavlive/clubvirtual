@@ -582,7 +582,7 @@ const settleAuctionTrx = async (data) => {
         }
 
         contractAbi = result.data.data.abi;
-
+        
         contractAbi = JSON.parse(contractAbi);
         contractAddress = result.data.data.address;
         rpcurl = result.data.rpc_url;
