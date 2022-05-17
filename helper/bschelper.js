@@ -69,6 +69,7 @@ const makeTransaction = async (data) => {
         let trData = "";
         let amt = data.amount * 1000000000000000000;
         // amt = amt.toFixed(0); 
+        console.log(amt);
         amt = BigInt(amt).toString();
 
         let adminFee = data.adminFee * 100;
