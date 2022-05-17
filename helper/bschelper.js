@@ -426,9 +426,9 @@ const makeSellAuctionTransaction = async (data) => {
 
         let trData = "";
         if (data.type == "switch") {
-            trData = nftContract.methods.switchSaleToAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), (data.platformFee * 100), data.auctionDuration, 10 * 100, data.startTime).encodeABI();
+            trData = nftContract.methods.switchSaleToAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), (data.platformFee * 100), data.auctionDuration, 10, data.startTime).encodeABI();
         } else {
-            trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), (data.platformFee * 100), data.auctionDuration, 10 * 100, data.startTime, "ftfffh").encodeABI();
+            trData = nftContract.methods.createNewNFTAuction(data.contractAddress, data.tokenId, data.erc20, amt, (data.royalty * 100), (data.comission * 100), (data.platformFee * 100), data.auctionDuration, 10, data.startTime, "ftfffh").encodeABI();
         }
         // console.log("RUN");
         let estimates_gas = await newweb3js.eth.estimateGas({
