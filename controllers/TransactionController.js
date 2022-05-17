@@ -164,13 +164,7 @@ const bidTrx = async (req, res) => {
         tokenId: req.body.tokenId,
     }
     //  console.log("makeOrder", req.body);
-    if (currency == "ETH") {
-        tx = await ethHelper.makeBidTransaction(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.makeBidTransaction(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.makeBidTransaction(txObj)
-    }
+    tx = await bscHelper.makeBidTransaction(txObj)
     res.send(tx);
 }
 
@@ -184,13 +178,7 @@ const bidInfo = async (req, res) => {
         tokenId: req.body.tokenId,
     }
     //  console.log("makeOrder", req.body);
-    if (currency == "ETH") {
-        tx = await ethHelper.getBidInfo(txObj)
-    } else if (currency == "BNB") {
-        tx = await bscHelper.getBidInfo(txObj)
-    } else if (currency == "MATIC") {
-        tx = await maticHelper.getBidInfo(txObj)
-    }
+    tx = await bscHelper.getBidInfo(txObj)
     res.send(tx);
 }
 
