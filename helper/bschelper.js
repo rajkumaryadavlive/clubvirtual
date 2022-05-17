@@ -68,7 +68,8 @@ const makeTransaction = async (data) => {
 
         let trData = "";
         
-        let amt = data.amount * 1e18;
+        // let amt = data.amount * 1000000000000000000;
+        amt = newweb3js.utils.toWei(data.amount, "ether")
         // amt = amt.toFixed(0); 
         console.log(amt);
         amt = BigInt(amt).toString();
