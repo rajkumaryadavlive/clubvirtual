@@ -67,12 +67,12 @@ const makeTransaction = async (data) => {
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
+        data.amount = 0.5125;
         let amt = data.amount * 1000000000000000000;
         // amt = amt.toFixed(0); 
         console.log(amt);
         amt = BigInt(amt).toString();
 
-        amt = "512500000000000000";
         let adminFee = data.adminFee * 100;
         let royalty = data.royalty * 10000000000;
         royalty = royalty.toFixed(0);
