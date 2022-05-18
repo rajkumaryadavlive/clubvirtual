@@ -67,7 +67,7 @@ const makeTransaction = async (data) => {
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-        
+
         // let amt = data.amount * 1000000000000000000;
         let amt = newweb3js.utils.toWei(data.amount, "ether");
         // amt = amt.toFixed(0); 
@@ -87,7 +87,7 @@ const makeTransaction = async (data) => {
 
             voucher.minPrice = minPrice;
 
-            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, adminFee, (data.royalty * 100),(data.platform_fee * 100)).encodeABI();
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, adminFee, (data.royalty * 100), (data.platform_fee * 100)).encodeABI();
         } else if (data.standard == "1155" && data.is_offer == "yes") {
             trData = nftContract.methods.buyFromProposalERC1155(data.token_id).encodeABI();
         } else if (data.standard == "1155") {
@@ -169,7 +169,7 @@ const makeProposal = async (data) => {
         let amt = newweb3js.utils.toWei(data.amount, "ether");
         // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
-        
+
         trData = nftContract.methods.acceptBuyProposal(data.contractAddress, data.tokenId, amt, data.buyerAccount).encodeABI();
 
         // let gasLimit = newweb3jsz.utils.toHex(estimates_gas * 2);
@@ -187,6 +187,52 @@ const makeProposal = async (data) => {
         };
 
         return tx;
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
+const readSaleContract = async (data) => {
+    try {
+        let apiUrl = process.env.API_URL + "get-abi";
+        console.log(data);
+        let rpcurl = "";
+        let contractAddress = "";
+        let contractAbi = "";
+
+        let result = await axios.post(apiUrl, {
+            blockchain: data.currency,
+            type: 'auction'
+        });
+        if (result.data.status != 1) {
+            res.send('0')
+        }
+
+        contractAbi = result.data.data.abi;
+
+        contractAbi = JSON.parse(contractAbi);
+        contractAddress = result.data.data.address;
+        rpcurl = result.data.rpc_url;
+
+        newweb3js = new web3(
+            new web3.providers.HttpProvider(rpcurl)
+        );
+
+        let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
+
+        let trData = "";
+        if (data.standard == "1155") {
+            trData = nftContract.methods.nftContract1155Sale(data.contractAddress, data.tokenId).call();
+        } else {
+            trData = await nftContract.methods.nftContractSale(data.contractAddress, data.token_id).call();
+        }
+        let buyNowPrice = trData['buyNowPrice'];
+        if (buyNowPrice <= 0 && data.standard == "721") {
+            trData = await nftContract.methods.nftContractAuctions(data.contractAddress, data.token_id).call();
+            trData['buyNowPrice'] = trData['minPrice'];
+        }
+        return trData;
     } catch (e) {
         console.log(e);
         return null;
@@ -291,7 +337,7 @@ const makeSellTransaction = async (data) => {
         let trData = "";
 
         if (data.standard == "1155") {
-            trData = nftContract.methods.createResaleERC1155(data.tokenId,'1',amt, "0x0000000000000000000000000000000000000000", (data.comission * 100), (data.platformFee * 100),(data.royalty * 100)).encodeABI();
+            trData = nftContract.methods.createResaleERC1155(data.tokenId, '1', amt, "0x0000000000000000000000000000000000000000", (data.comission * 100), (data.platformFee * 100), (data.royalty * 100)).encodeABI();
         } else if (data.type == "switch") {
             trData = nftContract.methods.switchAuctionToSale(data.contractAddress, data.tokenId, "0x0000000000000000000000000000000000000000", (data.comission * 100), (data.platformFee * 100), amt, (data.royalty * 100)).encodeABI();
         } else {
@@ -360,10 +406,10 @@ const removeSale = async (data) => {
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
 
         let trData = "";
-        
-        if(data.standard == "1155"){
+
+        if (data.standard == "1155") {
             trData = nftContract.methods.withdrawERC1155Sale(data.tokenId).encodeABI();
-        } else{
+        } else {
             trData = nftContract.methods.withdrawSale(data.contractAddress, data.tokenId).encodeABI();
         }
 
@@ -589,7 +635,7 @@ const settleAuctionTrx = async (data) => {
         }
 
         contractAbi = result.data.data.abi;
-        
+
         contractAbi = JSON.parse(contractAbi);
         contractAddress = result.data.data.address;
         rpcurl = result.data.rpc_url;
@@ -1018,5 +1064,6 @@ module.exports = {
     transferNftToOwner,
     removeFromAuction,
     removeSale,
-    makeProposal
+    makeProposal,
+    readSaleContract
 }

@@ -322,6 +322,25 @@ const ownerOf = async (req, res) => {
     console.log(trData);
     res.send(trData);
 }
+
+
+const readSale = async (req,res) => {
+    const currency = req.body.currency;
+    adminAddress = req.body.to;
+    let tx = "";
+
+    const txObj = {
+        currency: currency,
+        standard: req.body.standard,
+        contractAddress: req.body.contractAddress,
+        token_id: req.body.tokenId,
+    }
+
+    tx = await bscHelper.readSaleContract(txObj);
+
+    res.send(tx)
+}
+
 module.exports = {
     makeTrx,
     sellTrx,
@@ -335,5 +354,6 @@ module.exports = {
     transferToAdmin,
     ownerOf,
     removeFromSale,
-    proposalTrx
+    proposalTrx,
+    readSale
 };

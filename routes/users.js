@@ -62,4 +62,6 @@ router.post('/uploadFileToIpfs',  blockchainController.uploadFileToIpfs);
 
 router.post('/sign-message',  blockchainController.signMsg);
 
+router.post('/read-sale',  transactionController.readSale);
+
 module.exports = router;
