@@ -82,9 +82,8 @@ const makeTransaction = async (data) => {
         console.log(amt);
         if (data.functionName == "redeem") {
             let voucher = JSON.parse(data.voucher);
-            let minPrice = voucher.minPrice * 1000000000000000000;
-            minPrice = minPrice.toFixed(0);
-            minPrice = BigInt(minPrice).toString();
+            
+            let minPrice = newweb3js.utils.toWei(voucher.minPrice, "ether");
 
             voucher.minPrice = minPrice;
 
