@@ -428,7 +428,7 @@ const makeSellAuctionTransaction = async (data) => {
 
         // let amt = data.amount * 1000000000000000000;
         let amt = newweb3js.utils.toWei(data.amount, "ether");
-        amt = amt.toFixed(0);
+        // amt = amt.toFixed(0);
         amt = BigInt(amt).toString();
 
         let trData = "";
