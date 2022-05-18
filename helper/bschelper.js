@@ -82,12 +82,12 @@ const makeTransaction = async (data) => {
         console.log(amt);
         if (data.functionName == "redeem") {
             let voucher = JSON.parse(data.voucher);
-            
+
             let minPrice = newweb3js.utils.toWei(voucher.minPrice, "ether");
 
             voucher.minPrice = minPrice;
 
-            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, amt, adminFee, (data.royalty * 100),(data.platform_fee * 100)).encodeABI();
+            trData = nftContract.methods.redeem(data.selectedAccount, voucher, data.nft_creator, data.admin, adminFee, (data.royalty * 100),(data.platform_fee * 100)).encodeABI();
         } else if (data.standard == "1155" && data.is_offer == "yes") {
             trData = nftContract.methods.buyFromProposalERC1155(data.token_id).encodeABI();
         } else if (data.standard == "1155") {
