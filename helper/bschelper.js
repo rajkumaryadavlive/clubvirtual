@@ -223,7 +223,7 @@ const readSaleContract = async (data) => {
 
         let trData = "";
         if (data.standard == "1155") {
-            trData = nftContract.methods.nftContract1155Sale(data.contractAddress, data.tokenId).call();
+            trData = nftContract.methods.nftContract1155Sale(data.contractAddress, data.token_id).call();
         } else {
             trData = await nftContract.methods.nftContractSale(data.contractAddress, data.token_id).call();
         }
