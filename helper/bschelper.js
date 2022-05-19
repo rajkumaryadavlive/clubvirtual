@@ -272,7 +272,7 @@ const changePrice = async (data) => {
 
         let trData = "";
         if (data.standard == "1155") {
-            trData = nftContract.methods.changeBuyNowPriceERC1155(data.contractAddress, data.token_id,amt).encodeABI();
+            trData = nftContract.methods.changeBuyNowPriceERC1155(data.token_id,amt).encodeABI();
         } else if(data.on_auction == '1'){
             trData = await nftContract.methods.increaseAuctionMinPrice(data.contractAddress, data.token_id, amt).encodeABI();
         } else {
