@@ -239,6 +239,65 @@ const readSaleContract = async (data) => {
     }
 }
 
+const changePrice = async (data) => {
+    try {
+        let apiUrl = process.env.API_URL + "get-abi";
+        console.log(data);
+        let rpcurl = "";
+        let contractAddress = "";
+        let contractAbi = "";
+
+        let result = await axios.post(apiUrl, {
+            blockchain: data.currency,
+            type: 'auction'
+        });
+        if (result.data.status != 1) {
+            res.send('0')
+        }
+
+        contractAbi = result.data.data.abi;
+
+        contractAbi = JSON.parse(contractAbi);
+        contractAddress = result.data.data.address;
+        rpcurl = result.data.rpc_url;
+
+        newweb3js = new web3(
+            new web3.providers.HttpProvider(rpcurl)
+        );
+        
+        const nonce = await newweb3js.eth.getTransactionCount(data.selectedAccount, 'latest');
+
+        let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
+        let amt = newweb3js.utils.toWei(data.amount, "ether");
+
+        let trData = "";
+        if (data.standard == "1155") {
+            trData = nftContract.methods.changeBuyNowPriceERC1155(data.contractAddress, data.tokenId,amt).encodeABI();
+        } else if(data.on_auction == '1'){
+            trData = await nftContract.methods.increaseAuctionMinPrice(data.contractAddress, data.token_id, amt).encodeABI();
+        } else {
+            trData = await nftContract.methods.changeBuyNowPrice(data.contractAddress, data.token_id, amt).encodeABI();
+        }
+
+        let gasPrice_bal = await newweb3js.eth.getGasPrice();
+        let gasPrice = newweb3js.utils.toHex(gasPrice_bal * 2);
+
+        tx = {
+            'from': data.selectedAccount,
+            'to': contractAddress,
+            'nonce': nonce,
+            // 'gas': 500000,
+            'gasPrice': gasPrice,
+            'data': trData,
+        };
+        return tx;
+
+    } catch (e) {
+        console.log(e);
+        return null;
+    }
+}
+
 
 const makeBatchTransaction = async (data) => {
     try {
@@ -1065,5 +1124,6 @@ module.exports = {
     removeFromAuction,
     removeSale,
     makeProposal,
-    readSaleContract
+    readSaleContract,
+    changePrice
 }

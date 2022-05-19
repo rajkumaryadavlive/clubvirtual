@@ -340,6 +340,25 @@ const readSale = async (req,res) => {
 
     res.send(tx)
 }
+const changePrice = async (req,res) => {
+    const currency = req.body.currency;
+    adminAddress = req.body.to;
+    let tx = "";
+
+    const txObj = {
+        currency: currency,
+        standard: req.body.standard,
+        selectedAccount: req.body.selectedAccount,
+        contractAddress: req.body.contractAddress,
+        token_id: req.body.tokenId,
+        amount: req.body.amount,
+        on_auction: req.body.on_auction,
+    }
+
+    tx = await bscHelper.changePrice(txObj);
+
+    res.send(tx)
+}
 
 module.exports = {
     makeTrx,
@@ -355,5 +374,6 @@ module.exports = {
     ownerOf,
     removeFromSale,
     proposalTrx,
-    readSale
+    readSale,
+    changePrice
 };
