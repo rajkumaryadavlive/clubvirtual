@@ -264,7 +264,7 @@ const changePrice = async (data) => {
         newweb3js = new web3(
             new web3.providers.HttpProvider(rpcurl)
         );
-        
+
         const nonce = await newweb3js.eth.getTransactionCount(data.selectedAccount, 'latest');
 
         let nftContract = new newweb3js.eth.Contract(contractAbi, contractAddress);
@@ -272,11 +272,11 @@ const changePrice = async (data) => {
 
         let trData = "";
         if (data.standard == "1155") {
-            trData = nftContract.methods.changeBuyNowPriceERC1155(data.token_id,amt).encodeABI();
-        } else if(data.on_auction == '1'){
-            trData = await nftContract.methods.increaseAuctionMinPrice(data.contractAddress, data.token_id, amt).encodeABI();
+            trData = nftContract.methods.changeSaleERC1155(data.token_id, amt, data.royalties).encodeABI();
+        } else if (data.on_auction == '1') {
+            trData = await nftContract.methods.changeAuction(data.contractAddress, data.token_id, amt, data.auction_period, data.royalties).encodeABI();
         } else {
-            trData = await nftContract.methods.changeBuyNowPrice(data.contractAddress, data.token_id, amt).encodeABI();
+            trData = await nftContract.methods.changeSale(data.contractAddress, data.token_id, amt, data.royalties).encodeABI();
         }
 
         let gasPrice_bal = await newweb3js.eth.getGasPrice();

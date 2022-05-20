@@ -353,6 +353,8 @@ const changePrice = async (req,res) => {
         token_id: req.body.tokenId,
         amount: req.body.amount,
         on_auction: req.body.on_auction,
+        auction_period: req.body.auction_period,
+        royalties: req.body.royalties,
     }
 
     tx = await bscHelper.changePrice(txObj);
