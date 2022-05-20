@@ -360,6 +360,18 @@ const changePrice = async (req,res) => {
     res.send(tx)
 }
 
+const getBalance = async(req,res) => {
+    const currency = req.body.currency;
+
+    let newweb3js = new web3(
+        new web3.providers.HttpProvider(req.body.rpc_url)
+    );
+    
+    let result = await newweb3js.eth.getBalance(req.body.address);
+    result = newweb3js.utils.fromWei(result, "ether");
+    res.send(result);
+}
+
 module.exports = {
     makeTrx,
     sellTrx,
@@ -375,5 +387,6 @@ module.exports = {
     removeFromSale,
     proposalTrx,
     readSale,
-    changePrice
+    changePrice,
+    getBalance
 };
