@@ -81,7 +81,9 @@ router.post("/add", upload.single("myFile"), (req, res) => {
         console.log(`https://gateway.ipfs.io/ipfs/${file2[0].path}`);
         
         ////////////////////////////////////////
-        res.send(file2[0].path);
+        let hash2 = file2[0].path;
+        let arr = {hash1,hash2};
+        res.send(arr);
       });
     });
     ////////////
