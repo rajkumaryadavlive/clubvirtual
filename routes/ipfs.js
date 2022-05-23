@@ -92,6 +92,38 @@ router.post("/add", upload.single("myFile"), (req, res) => {
   }
 });
 
+router.post("/add-img", upload.single("myFile"), (req, res) => {
+  try {
+    
+    console.log(req.body);
 
+    let metadata = JSON.parse(req.body.metadata);
+      
+      let testFile1 = {
+        name: metadata.name,
+        description: metadata.description,
+        image: metadata.image,
+        attributes: JSON.parse(metadata.attributes),
+      };
+
+      let testBuffer2 = new Buffer.from(JSON.stringify(testFile1));
+      ipfs.files.add(testBuffer2, function (err2, file2) {
+        if (err2) {
+          console.log(err2);
+        }
+        //console.log(file2);
+        console.log(`https://gateway.ipfs.io/ipfs/${file2[0].path}`);
+        
+        ////////////////////////////////////////
+        let hash2 = file2[0].path;
+
+        res.send(hash2);
+      });
+      
+    ////////////
+  } catch (err) {
+    res.send(400);
+  }
+});
 
 module.exports = router;
