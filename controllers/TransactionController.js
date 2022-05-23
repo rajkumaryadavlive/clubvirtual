@@ -290,7 +290,7 @@ const ownerOf = async (req, res) => {
         contractAddress: req.body.contractAddress,
         standard: req.body.standard
     }
-    console.log(txObj);
+    
     let contractAbi = "";
     let contractAddress = txObj.contractAddress;
     let apiUrl = process.env.API_URL + "get-abi";
