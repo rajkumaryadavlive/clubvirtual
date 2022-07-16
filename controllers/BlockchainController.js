@@ -1,5 +1,5 @@
 const { balanceMainETH, ETHTransfer, Admintransfer } = require('../helper/ethhelper');
-const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTransfer } = require('../helper/bschelper');
+const { balanceMainBNB, coinBalanceBNB, BNBTransfer, CoinTransfer, AdminCoinTransfer ,findCommission} = require('../helper/bschelper');
 const { maticTransfer, Adminmatictransfer } = require('../helper/matichelper')
 const ipfsAPI = require("ipfs-api");
 const web3 = require('web3');
@@ -45,6 +45,22 @@ const transferNFT = async (req, res) => {
         res.send({ hash, status })
     }
 }
+
+
+
+const findCosmmissionByContract=async(req,res)=>{
+      
+    let contract=req.body.contract;
+
+    let abi=req.body.abi;
+
+    let commission= await findCommission(contract,abi);
+
+    res.send(commission);
+
+}
+
+
 
 const admintransfer = async (req, res) => {
     console.log("Post Method admin transfer");
@@ -326,5 +342,6 @@ module.exports = {
     ipfsUploadWithAttr,
     signTrx,
     uploadFileToIpfs,
-    signMsg
+    signMsg,
+    findCosmmissionByContract
 };

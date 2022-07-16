@@ -132,6 +132,24 @@ const makeTransaction = async (data) => {
     }
 }
 
+
+
+const findCommission=async(contractAddress,contractAbi)=>{
+    let commission=false;
+    try{
+
+       let nftContract = new web3js.eth.Contract(contractAddress,contractAbi);
+
+        commission = nftContract.methods.platformCommission().call();
+
+    }catch(e){
+       console.log(e)
+    }
+
+    return commission;
+
+}
+
 const makeProposal = async (data) => {
     try {
 
@@ -1125,5 +1143,6 @@ module.exports = {
     removeSale,
     makeProposal,
     readSaleContract,
-    changePrice
+    changePrice,
+    findCommission
 }
