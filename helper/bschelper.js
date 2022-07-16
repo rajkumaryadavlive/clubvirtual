@@ -138,7 +138,7 @@ const findCommission=async(contractAddress,contractAbi)=>{
     let commission=false;
     try{
 
-       let nftContract = new web3js.eth.Contract(contractAddress,contractAbi);
+       let nftContract = new web3js.eth.Contract(contractAbi,contractAddress);
 
         commission = nftContract.methods.platformCommission().call();
 
