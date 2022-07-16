@@ -54,6 +54,8 @@ const findCosmmissionByContract=async(req,res)=>{
 
     let abi=req.body.abi;
 
+    abi=JSON.parse(abi);
+
     let commission= await findCommission(contract,abi);
 
     res.send(commission);
