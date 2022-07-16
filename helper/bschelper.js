@@ -11,8 +11,8 @@ const auctionContract = require('../contract/bsc-auction')
 
 const web3js = new web3(
     new web3.providers.HttpProvider(
-        "https://bsc-dataseed.binance.org/"
-        // "https://data-seed-prebsc-1-s1.binance.org:8545"
+        //"https://bsc-dataseed.binance.org/"
+         "https://data-seed-prebsc-1-s1.binance.org:8545"
         // "https://bsc-dataseed1.binance.org:443"
     )
 );
